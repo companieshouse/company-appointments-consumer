@@ -1,4 +1,4 @@
-package uk.gov.companieshouse;
+package uk.gov.companieshouse.company.appointments;
 
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;

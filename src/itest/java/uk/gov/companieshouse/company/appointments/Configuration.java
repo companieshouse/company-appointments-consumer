@@ -1,4 +1,4 @@
-package uk.gov.companieshouse;
+package uk.gov.companieshouse.company.appointments;
 
 import io.cucumber.spring.CucumberContextConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

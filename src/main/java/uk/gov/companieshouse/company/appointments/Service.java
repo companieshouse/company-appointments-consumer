@@ -1,4 +1,4 @@
-package uk.gov.companieshouse;
+package uk.gov.companieshouse.company.appointments;
 
 /**
  * Processes an incoming message.

@@ -1,4 +1,4 @@
-package uk.gov.companieshouse;
+package uk.gov.companieshouse.company.appointments;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;

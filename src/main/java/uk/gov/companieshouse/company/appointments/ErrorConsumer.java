@@ -1,4 +1,4 @@
-package uk.gov.companieshouse;
+package uk.gov.companieshouse.company.appointments;
 
 import java.util.Optional;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -22,7 +22,7 @@ import java.util.Collections;
 @Component
 public class ErrorConsumer<T> {
 
-    // TODO: Listening to two streams so need to adjust paths for application.yml variables accordingly
+    // TODO: Listening to two streams so need to adjust paths to appropriate application.yml variables
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Application.NAMESPACE);
 

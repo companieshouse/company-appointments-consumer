@@ -1,4 +1,4 @@
-package uk.gov.companieshouse;
+package uk.gov.companieshouse.company.appointments;
 
 /**
  * A recoverable exception has occurred e.g. due to a service that is temporarily unavailable.

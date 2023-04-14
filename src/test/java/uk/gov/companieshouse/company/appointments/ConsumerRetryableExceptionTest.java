@@ -1,4 +1,4 @@
-package uk.gov.companieshouse;
+package uk.gov.companieshouse.company.appointments;
 
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -24,6 +24,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @SpringBootTest(classes = Application.class)
@@ -33,10 +34,10 @@ import static org.mockito.Mockito.verify;
         controlledShutdown = true,
         partitions = 1
 )
-@TestPropertySource(locations = "classpath:application-test_main_nonretryable.yml")
+@TestPropertySource(locations = "classpath:application-test_main_retryable.yml")
 @Import(TestConfig.class)
-@ActiveProfiles("test_main_nonretryable")
-class ConsumerNonRetryableExceptionTest {
+@ActiveProfiles("test_main_retryable")
+class ConsumerRetryableExceptionTest {
 
     @Autowired
     private EmbeddedKafkaBroker embeddedKafkaBroker;
@@ -54,23 +55,23 @@ class ConsumerNonRetryableExceptionTest {
     private Service service;
 
     @Test
-    void testRepublishToInvalidMessageTopicIfNonRetryableExceptionThrown() throws InterruptedException {
+    void testRepublishToErrorTopicThroughRetryTopics() throws InterruptedException {
         //given
         embeddedKafkaBroker.consumeFromAllEmbeddedTopics(testConsumer);
-        doThrow(NonRetryableException.class).when(service).processMessage(any());
+        doThrow(RetryableException.class).when(service).processMessage(any());
 
         //when
         testProducer.send(new ProducerRecord<>("echo", 0, System.currentTimeMillis(), "key", "value"));
         if (!latch.await(30L, TimeUnit.SECONDS)) {
             fail("Timed out waiting for latch");
         }
-        ConsumerRecords<?, ?> consumerRecords = KafkaTestUtils.getRecords(testConsumer, 10000L, 2);
 
         //then
+        ConsumerRecords<?, ?> consumerRecords = KafkaTestUtils.getRecords(testConsumer, 10000L, 6);
         assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, "echo"), is(1));
-        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, "echo-echo-consumer-retry"), is(0));
-        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, "echo-echo-consumer-error"), is(0));
-        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, "echo-echo-consumer-invalid"), is(1));
-        verify(service).processMessage(new ServiceParameters("value"));
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, "echo-echo-consumer-retry"), is(4));
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, "echo-echo-consumer-error"), is(1));
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, "echo-echo-consumer-invalid"), is(0));
+        verify(service, times(5)).processMessage(new ServiceParameters("value"));
     }
 }

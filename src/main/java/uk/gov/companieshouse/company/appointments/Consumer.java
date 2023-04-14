@@ -1,4 +1,4 @@
-package uk.gov.companieshouse;
+package uk.gov.companieshouse.company.appointments;
 
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.RetryableTopic;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class Consumer {
 
-    // TODO: Listening to two streams so need to adjust paths for application.yml variables accordingly
+    // TODO: Listening to two streams so need to adjust paths to appropriate application.yml variables
 
     private final Service service;
     private final MessageFlags messageFlags;
