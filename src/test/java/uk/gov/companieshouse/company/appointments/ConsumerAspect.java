@@ -17,12 +17,12 @@ public class ConsumerAspect {
         this.latch = latch;
     }
 
-    @After("execution(* uk.gov.companieshouse.Consumer.consume(..))")
+    @After("execution(* uk.gov.companieshouse.company.appointments.Consumer.consume(..))")
     void afterConsume(JoinPoint joinPoint) {
         latch.countDown();
     }
 
-    @After("execution(* uk.gov.companieshouse.ErrorConsumer.consume(..))")
+    @After("execution(* uk.gov.companieshouse.company.appointments.ErrorConsumer.consume(..))")
     void afterErrorConsume(JoinPoint joinPoint) {
         latch.countDown();
     }

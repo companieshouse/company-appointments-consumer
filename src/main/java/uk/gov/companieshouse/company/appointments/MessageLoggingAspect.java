@@ -33,22 +33,22 @@ public class MessageLoggingAspect {
     private static final String LOG_MESSAGE_RECEIVED = "Processing delta";
     private static final String LOG_MESSAGE_PROCESSED = "Processed delta";
 
-    @Before("execution(* uk.gov.companieshouse.Consumer.consume(..))")
+    @Before("execution(* uk.gov.companieshouse.company.appointments.Consumer.consume(..))")
     void logBeforeMainConsumer(JoinPoint joinPoint) {
         logMessage(LOG_MESSAGE_RECEIVED, (Message<?>)joinPoint.getArgs()[0]);
     }
 
-    @After("execution(* uk.gov.companieshouse.Consumer.consume(..))")
+    @After("execution(* uk.gov.companieshouse.company.appointments.Consumer.consume(..))")
     void logAfterMainConsumer(JoinPoint joinPoint) {
         logMessage(LOG_MESSAGE_PROCESSED, (Message<?>)joinPoint.getArgs()[0]);
     }
 
-    @Before("execution(* uk.gov.companieshouse.ErrorConsumer.consume(..))")
+    @Before("execution(* uk.gov.companieshouse.company.appointments.ErrorConsumer.consume(..))")
     void logBeforeErrorConsumer(JoinPoint joinPoint) {
         logMessage(LOG_MESSAGE_RECEIVED, (Message<?>)joinPoint.getArgs()[0]);
     }
 
-    @After("execution(* uk.gov.companieshouse.ErrorConsumer.consume(..))")
+    @After("execution(* uk.gov.companieshouse.company.appointments.ErrorConsumer.consume(..))")
     void logAfterErrorConsumer(JoinPoint joinPoint) {
         logMessage(LOG_MESSAGE_PROCESSED, (Message<?>)joinPoint.getArgs()[0]);
     }
