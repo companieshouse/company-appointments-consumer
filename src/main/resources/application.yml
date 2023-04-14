@@ -1,0 +1,56 @@
+server:
+  port: ${SERVER_PORT}
+
+spring:
+  kafka:
+    bootstrap-servers: ${BOOTSTRAP_SERVER_URL}
+
+consumer:
+  group_id: ${GROUP_ID}
+  max_attempts: ${MAX_ATTEMPTS}
+  backoff_delay: ${BACKOFF_DELAY}
+  concurrency: ${CONCURRENT_LISTENER_INSTANCES}
+  officers:
+    topic: ${STREAM_COMPANY_OFFICERS_TOPIC}
+  profile:
+    topic: ${STREAM_COMPANY_PROFILE_TOPIC}
+
+error_consumer:
+  group_id: ${ERROR_GROUP_ID}
+  enabled: ${IS_ERROR_CONSUMER}
+  concurrency: ${CONCURRENT_ERROR_LISTENER_INSTANCES}
+  officers:
+    topic: ${STREAM_COMPANY_OFFICERS_ERROR_TOPIC}
+    dlt: ${STREAM_COMPANY_OFFICERS_RETRY_TOPIC}
+  profile:
+    topic: ${STREAM_COMPANY_PROFILE_ERROR_TOPIC}
+    dlt: ${STREAM_COMPANY_PROFILE_RETRY_TOPIC}
+
+invalid_message_topic:
+  officers: ${STREAM_COMPANY_OFFICERS_INVALID_MESSAGE_TOPIC}
+  profile: ${STREAM_COMPANY_PROFILE_INVALID_MESSAGE_TOPIC}
+
+logger:
+  namespace: company-appointments-consumer
+
+management:
+  endpoints:
+    enabled-by-default: false
+    web:
+      base-path: /company-appointments-consumer
+      path-mapping:
+        health: healthcheck
+  endpoint:
+    health:
+      show-details: never
+      enabled: true
+
+chs:
+  kafka:
+    api:
+      endpoint: ${CHS_KAFKA_API_URL:localhost}
+      key: ${CHS_API_KEY:chsApiKey}
+api:
+  api-url: ${API_URL:localhost}
+  api-key: ${CHS_API_KEY:chsApiKey}
+  payments-url: ${PAYMENTS_URL:localhost}
