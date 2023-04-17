@@ -65,6 +65,8 @@ class ErrorConsumerRetryableExceptionTest {
             fail("Timed out waiting for latch");
         }
 
+        // FIXME: Records going on error and invalid topic but not retry
+        // FIXME: ErrorConsumer is not being hit
         //then
         ConsumerRecords<String, String> consumerRecords = KafkaTestUtils.getRecords(testConsumer, 10000L, 2);
         assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, "echo"), is(0));
