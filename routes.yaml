@@ -1,0 +1,5 @@
+app_name: company-appointments-consumer
+group: api
+weight: 99998
+routes:
+    1: ^/company-appointments-consumer/healthcheck
