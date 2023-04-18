@@ -34,7 +34,7 @@ import static org.mockito.Mockito.verify;
         controlledShutdown = true,
         partitions = 1
 )
-@TestPropertySource(locations = "classpath:application-test_main_retryable.yml")
+@TestPropertySource(locations = "classpath:application-test_main_retryable.properties")
 @Import(TestConfig.class)
 @ActiveProfiles("test_main_retryable")
 class ConsumerRetryableExceptionTest {

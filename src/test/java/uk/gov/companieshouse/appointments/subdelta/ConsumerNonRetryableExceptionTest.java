@@ -33,7 +33,7 @@ import static org.mockito.Mockito.verify;
         controlledShutdown = true,
         partitions = 1
 )
-@TestPropertySource(locations = "classpath:application-test_main_nonretryable.yml")
+@TestPropertySource(locations = "classpath:application-test_main_nonretryable.properties")
 @Import(TestConfig.class)
 @ActiveProfiles("test_main_nonretryable")
 class ConsumerNonRetryableExceptionTest {
