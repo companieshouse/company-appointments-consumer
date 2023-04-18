@@ -11,7 +11,7 @@ import java.util.concurrent.CountDownLatch;
 @Component
 public class ConsumerAspect {
 
-    private CountDownLatch latch;
+    private final CountDownLatch latch;
 
     public ConsumerAspect(CountDownLatch latch) {
         this.latch = latch;
@@ -19,11 +19,6 @@ public class ConsumerAspect {
 
     @After("execution(* Consumer.consume(..))")
     void afterConsume(JoinPoint joinPoint) {
-        latch.countDown();
-    }
-
-    @After("execution(* ErrorConsumer.consume(..))")
-    void afterErrorConsume(JoinPoint joinPoint) {
         latch.countDown();
     }
 }

@@ -15,17 +15,6 @@ consumer:
   profile:
     topic: ${STREAM_COMPANY_PROFILE_TOPIC}
 
-error_consumer:
-  group_id: ${ERROR_GROUP_ID}
-  enabled: ${IS_ERROR_CONSUMER}
-  concurrency: ${CONCURRENT_ERROR_LISTENER_INSTANCES}
-  officers:
-    topic: ${STREAM_COMPANY_OFFICERS_ERROR_TOPIC}
-    dlt: ${STREAM_COMPANY_OFFICERS_RETRY_TOPIC}
-  profile:
-    topic: ${STREAM_COMPANY_PROFILE_ERROR_TOPIC}
-    dlt: ${STREAM_COMPANY_PROFILE_RETRY_TOPIC}
-
 invalid_message_topic:
   officers: ${STREAM_COMPANY_OFFICERS_INVALID_MESSAGE_TOPIC}
   profile: ${STREAM_COMPANY_PROFILE_INVALID_MESSAGE_TOPIC}
