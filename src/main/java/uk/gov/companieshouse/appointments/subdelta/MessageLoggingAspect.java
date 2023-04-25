@@ -3,7 +3,6 @@ package uk.gov.companieshouse.appointments.subdelta;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
@@ -15,8 +14,8 @@ import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.logging.LoggerFactory;
 
 /**
- * Logs message details before and after it has been processed by
- * the {@link Consumer main consumer}.<br>
+ * Logs message details before and after it has been processed by the
+ * {@link Consumer main consumer}.<br>
  * <br>
  * Details that will be logged will include:
  * <ul>
@@ -46,11 +45,14 @@ public class MessageLoggingAspect {
     }
 
     private void logMessage(String logMessage, Message<?> incomingMessage) {
-        String topic = Optional.ofNullable((String) incomingMessage.getHeaders().get(KafkaHeaders.RECEIVED_TOPIC))
+        String topic = Optional.ofNullable(
+                        (String) incomingMessage.getHeaders().get(KafkaHeaders.RECEIVED_TOPIC))
                 .orElse("no topic");
-        Integer partition = Optional.ofNullable((Integer) incomingMessage.getHeaders().get(KafkaHeaders.RECEIVED_PARTITION_ID))
+        Integer partition = Optional.ofNullable(
+                        (Integer) incomingMessage.getHeaders().get(KafkaHeaders.RECEIVED_PARTITION_ID))
                 .orElse(0);
-        Long offset = Optional.ofNullable((Long) incomingMessage.getHeaders().get(KafkaHeaders.OFFSET))
+        Long offset = Optional.ofNullable(
+                        (Long) incomingMessage.getHeaders().get(KafkaHeaders.OFFSET))
                 .orElse(0L);
         Map<String, Object> logData = new HashMap<>(
                 Map.of(

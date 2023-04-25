@@ -12,4 +12,5 @@ import org.junit.platform.suite.api.Suite;
 @SelectClasspathResource("features")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "uk.gov.companieshouse.appointments.subdelta")
 public class Runner {
+
 }

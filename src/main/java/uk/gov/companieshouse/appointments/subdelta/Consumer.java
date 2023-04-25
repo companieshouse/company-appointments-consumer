@@ -4,17 +4,18 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.RetryableTopic;
 import org.springframework.kafka.retrytopic.DltStrategy;
 import org.springframework.kafka.retrytopic.FixedDelayStrategy;
+import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Component;
+import uk.gov.companieshouse.stream.ResourceChangedData;
 
 /**
  * Consumes messages from the configured main Kafka topic.
  */
 @Component
 public class Consumer {
-
-    // TODO: Listening to two streams so need to adjust paths to appropriate application.properties variables
 
     private final Service service;
     private final MessageFlags messageFlags;
@@ -32,7 +33,7 @@ public class Consumer {
     @KafkaListener(
             id = "${consumer.group_id}",
             containerFactory = "kafkaListenerContainerFactory",
-            topics = "${consumer.topic}",
+            topics = "${consumer.officers.topic}",
             groupId = "${consumer.group_id}"
     )
     @RetryableTopic(
@@ -45,12 +46,17 @@ public class Consumer {
             fixedDelayTopicStrategy = FixedDelayStrategy.SINGLE_TOPIC,
             include = RetryableException.class
     )
-    public void consume(Message<String> message) {
+    public void consume(Message<ResourceChangedData> message,
+            @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
+            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) String partition,
+            @Header(KafkaHeaders.OFFSET) String offset) {
         try {
-            service.processMessage(new ServiceParameters(message.getPayload()));
-        } catch (RetryableException e) {
+            String updatedBy = String.format("%s-%s-%s", topic, partition, offset);
+
+            service.processMessage(new ServiceParameters(message.getPayload(), updatedBy));
+        } catch (RetryableException exception) {
             messageFlags.setRetryable(true);
-            throw e;
+            throw exception;
         }
     }
 }

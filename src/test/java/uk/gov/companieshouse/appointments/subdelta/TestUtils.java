@@ -5,7 +5,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 
 public final class TestUtils {
 
-    private TestUtils(){
+    private TestUtils() {
     }
 
     public static int noOfRecordsForTopic(ConsumerRecords<?, ?> records, String topic) {

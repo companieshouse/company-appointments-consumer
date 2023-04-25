@@ -1,41 +1,25 @@
 package uk.gov.companieshouse.appointments.subdelta;
 
-import java.util.Objects;
+import uk.gov.companieshouse.stream.ResourceChangedData;
 
 /**
  * Contains all parameters required by {@link Service service implementations}.
  */
 public class ServiceParameters {
 
-    private final String data;
+    private final ResourceChangedData resourceChangedData;
+    private final String updatedBy;
 
-    public ServiceParameters(String data) {
-        this.data = data;
+    public ServiceParameters(ResourceChangedData resourceChangedData, String updatedBy) {
+        this.resourceChangedData = resourceChangedData;
+        this.updatedBy = updatedBy;
     }
 
-    /**
-     * Get data attached to the ServiceParameters object.
-     *
-     * @return A string representing data that has been attached to the ServiceParameters object.
-     */
-    public String getData() {
-        return data;
+    public ResourceChangedData getResourceChangedData() {
+        return resourceChangedData;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof ServiceParameters)) {
-            return false;
-        }
-        ServiceParameters that = (ServiceParameters) o;
-        return Objects.equals(getData(), that.getData());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getData());
+    public String getUpdatedBy() {
+        return updatedBy;
     }
 }
