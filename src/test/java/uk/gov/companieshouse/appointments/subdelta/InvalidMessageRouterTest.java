@@ -13,6 +13,7 @@ import static org.springframework.kafka.support.KafkaHeaders.ORIGINAL_PARTITION;
 import static org.springframework.kafka.support.KafkaHeaders.ORIGINAL_TOPIC;
 
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.companieshouse.stream.EventRecord;
 import uk.gov.companieshouse.stream.ResourceChangedData;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,11 +53,11 @@ class InvalidMessageRouterTest {
                         new RecordHeader(ORIGINAL_TOPIC, "main".getBytes()),
                         new RecordHeader(ORIGINAL_PARTITION, BigInteger.ZERO.toByteArray()),
                         new RecordHeader(ORIGINAL_OFFSET, BigInteger.ONE.toByteArray()),
-                        new RecordHeader(EXCEPTION_MESSAGE, "[invalid]".getBytes())));
+                        new RecordHeader(EXCEPTION_MESSAGE, "invalid".getBytes())));
 
-        ResourceChangedData invalidData = new ResourceChangedData();
-        invalidData.setData(
-                "{ \"invalid_message\": \"exception: [ [invalid] ] passed for topic: main, partition: 0, offset: 1\" }");
+        ResourceChangedData invalidData = new ResourceChangedData("", "", "", "",
+                "{ \"invalid_message\": \"exception: [ invalid ] passed for topic: main, partition: 0, offset: 1\" }",
+                new EventRecord("", "", Collections.emptyList()));
         // when
         ProducerRecord<String, ResourceChangedData> actual = invalidMessageRouter.onSend(message);
 
@@ -70,9 +72,10 @@ class InvalidMessageRouterTest {
         ProducerRecord<String, ResourceChangedData> message = new ProducerRecord<>("main", "key",
                 changedData);
 
-        ResourceChangedData invalidData = new ResourceChangedData();
-        invalidData.setData(
-                "{ \"invalid_message\": \"exception: [ unknown ] passed for topic: unknown, partition: -1, offset: -1\" }");
+
+        ResourceChangedData invalidData = new ResourceChangedData("", "", "", "",
+                "{ \"invalid_message\": \"exception: [ unknown ] passed for topic: unknown, partition: -1, offset: -1\" }",
+                new EventRecord("", "", Collections.emptyList()));
 
         // when
         ProducerRecord<String, ResourceChangedData> actual = invalidMessageRouter.onSend(message);

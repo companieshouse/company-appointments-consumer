@@ -8,18 +8,12 @@ import uk.gov.companieshouse.stream.ResourceChangedData;
 public class ServiceParameters {
 
     private final ResourceChangedData resourceChangedData;
-    private final String updatedBy;
 
-    public ServiceParameters(ResourceChangedData resourceChangedData, String updatedBy) {
+    public ServiceParameters(ResourceChangedData resourceChangedData) {
         this.resourceChangedData = resourceChangedData;
-        this.updatedBy = updatedBy;
     }
 
     public ResourceChangedData getResourceChangedData() {
         return resourceChangedData;
-    }
-
-    public String getUpdatedBy() {
-        return updatedBy;
     }
 }

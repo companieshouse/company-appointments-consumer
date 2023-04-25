@@ -4,9 +4,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.RetryableTopic;
 import org.springframework.kafka.retrytopic.DltStrategy;
 import org.springframework.kafka.retrytopic.FixedDelayStrategy;
-import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.stream.ResourceChangedData;
@@ -46,14 +44,9 @@ public class Consumer {
             fixedDelayTopicStrategy = FixedDelayStrategy.SINGLE_TOPIC,
             include = RetryableException.class
     )
-    public void consume(Message<ResourceChangedData> message,
-            @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) String partition,
-            @Header(KafkaHeaders.OFFSET) String offset) {
+    public void consume(Message<ResourceChangedData> message) {
         try {
-            String updatedBy = String.format("%s-%s-%s", topic, partition, offset);
-
-            service.processMessage(new ServiceParameters(message.getPayload(), updatedBy));
+            service.processMessage(new ServiceParameters(message.getPayload()));
         } catch (RetryableException exception) {
             messageFlags.setRetryable(true);
             throw exception;

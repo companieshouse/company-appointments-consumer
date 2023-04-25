@@ -12,7 +12,6 @@ class AppointmentsChangeService implements Service {
 
     private final CompanyProfileClient companyProfileClient;
     private final AppointmentsClient appointmentsClient;
-
     private final CompanyNumberExtractor companyNumberExtractor;
 
     public AppointmentsChangeService(CompanyProfileClient companyProfileClient,
@@ -24,7 +23,6 @@ class AppointmentsChangeService implements Service {
 
     @Override
     public void processMessage(ServiceParameters parameters) {
-
         ResourceChangedData changedData = parameters.getResourceChangedData();
         String companyNumber = companyNumberExtractor.extractFromUri(changedData.getResourceUri());
 

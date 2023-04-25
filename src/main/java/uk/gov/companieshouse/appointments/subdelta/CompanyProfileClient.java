@@ -12,7 +12,7 @@ import uk.gov.companieshouse.api.handler.exception.URIValidationException;
 public class CompanyProfileClient {
 
     private static final String FAILED_MSG = "Failed fetching profile for company %s with context id %s";
-    private static final String ERROR_MSG = "Error %s fetching profile for company %s with context id %s";
+    private static final String ERROR_MSG = "HTTP response code %s when fetching profile for company %s with context id %s";
 
     private final Supplier<InternalApiClient> internalApiClientFactory;
     private final ResponseHandler responseHandler;

@@ -28,7 +28,6 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import uk.gov.companieshouse.stream.EventRecord;
 import uk.gov.companieshouse.stream.ResourceChangedData;
 
@@ -42,7 +41,6 @@ import uk.gov.companieshouse.stream.ResourceChangedData;
         controlledShutdown = true,
         partitions = 1
 )
-@TestPropertySource(locations = "classpath:application-test_main_positive.properties")
 @Import(TestConfig.class)
 @ActiveProfiles("test_main_positive")
 class ConsumerPositiveTest {
