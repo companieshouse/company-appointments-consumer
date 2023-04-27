@@ -53,7 +53,7 @@ class AppointmentsClientTest {
         client.patchCompanyNameAndStatus(RESOURCE_URI, COMPANY_NAME, COMPANY_STATUS, CONTEXT_ID);
 
         // then
-        verify(resourceHandler).patchCompanyAppointment(RESOURCE_URI,
+        verify(resourceHandler).patchCompanyAppointment("/" + RESOURCE_URI,
                 new PatchAppointmentNameStatusApi()
                         .companyName(COMPANY_NAME)
                         .companyStatus(COMPANY_STATUS));
@@ -75,7 +75,7 @@ class AppointmentsClientTest {
         client.patchCompanyNameAndStatus(RESOURCE_URI, COMPANY_NAME, COMPANY_STATUS, CONTEXT_ID);
 
         // then
-        verify(resourceHandler).patchCompanyAppointment(RESOURCE_URI,
+        verify(resourceHandler).patchCompanyAppointment("/" + RESOURCE_URI,
                 new PatchAppointmentNameStatusApi()
                         .companyName(COMPANY_NAME)
                         .companyStatus(COMPANY_STATUS));
@@ -98,7 +98,7 @@ class AppointmentsClientTest {
         client.patchCompanyNameAndStatus(RESOURCE_URI, COMPANY_NAME, COMPANY_STATUS, CONTEXT_ID);
 
         // then
-        verify(resourceHandler).patchCompanyAppointment(RESOURCE_URI,
+        verify(resourceHandler).patchCompanyAppointment("/" + RESOURCE_URI,
                 new PatchAppointmentNameStatusApi()
                         .companyName(COMPANY_NAME)
                         .companyStatus(COMPANY_STATUS));
@@ -121,7 +121,7 @@ class AppointmentsClientTest {
         client.patchCompanyNameAndStatus(RESOURCE_URI, COMPANY_NAME, COMPANY_STATUS, CONTEXT_ID);
 
         // then
-        verify(resourceHandler).patchCompanyAppointment(RESOURCE_URI,
+        verify(resourceHandler).patchCompanyAppointment("/" + RESOURCE_URI,
                 new PatchAppointmentNameStatusApi()
                         .companyName(COMPANY_NAME)
                         .companyStatus(COMPANY_STATUS));

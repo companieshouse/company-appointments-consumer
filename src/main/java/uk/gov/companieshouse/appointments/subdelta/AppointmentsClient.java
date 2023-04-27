@@ -28,7 +28,7 @@ public class AppointmentsClient {
 
         try {
             client.privateDeltaResourceHandler()
-                    .patchCompanyAppointment(resourceUri, new PatchAppointmentNameStatusApi()
+                    .patchCompanyAppointment(String.format("/%s", resourceUri), new PatchAppointmentNameStatusApi()
                             .companyName(companyName)
                             .companyStatus(status))
                     .execute();
