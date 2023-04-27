@@ -32,7 +32,7 @@ class ResourceChangedDataDeserialiserTest {
             // given
             ResourceChangedData changeData = new ResourceChangedData("resource_kind",
                     "resource_uri", "context_id", "resource_id", "data",
-                    new EventRecord("", "", Collections.emptyList()));
+                    new EventRecord("published_at", "event_type", Collections.emptyList()));
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             Encoder encoder = EncoderFactory.get().directBinaryEncoder(outputStream, null);
             DatumWriter<ResourceChangedData> writer = new ReflectDatumWriter<>(

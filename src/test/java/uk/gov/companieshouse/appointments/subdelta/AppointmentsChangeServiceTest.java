@@ -1,5 +1,6 @@
 package uk.gov.companieshouse.appointments.subdelta;
 
+import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -16,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.companieshouse.api.company.Data;
+import uk.gov.companieshouse.stream.EventRecord;
 import uk.gov.companieshouse.stream.ResourceChangedData;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,6 +45,7 @@ class AppointmentsChangeServiceTest {
         ResourceChangedData changedData = new ResourceChangedData();
         changedData.setResourceUri(RESOURCE_URI);
         changedData.setContextId(CONTEXT_ID);
+        changedData.setEvent(new EventRecord("", "changed", emptyList()));
         ServiceParameters serviceParameters = new ServiceParameters(changedData);
 
         Data companyProfile = new Data()
@@ -62,11 +65,29 @@ class AppointmentsChangeServiceTest {
     }
 
     @Test
+    @DisplayName("Should not process a message when event type is deleted")
+    void processMessageDeleted() {
+        // given
+        ResourceChangedData changedData = new ResourceChangedData();
+        changedData.setEvent(new EventRecord("", "deleted", emptyList()));
+        ServiceParameters serviceParameters = new ServiceParameters(changedData);
+
+        // when
+        service.processMessage(serviceParameters);
+
+        // then
+        verifyNoInteractions(companyNumberExtractor);
+        verifyNoInteractions(companyProfileClient);
+        verifyNoInteractions(appointmentsClient);
+    }
+
+    @Test
     @DisplayName("Should not call api clients when company number extractor throws non retryable exception")
     void processMessageBadURI() {
         // given
         ResourceChangedData changedData = new ResourceChangedData();
         changedData.setResourceUri(RESOURCE_URI);
+        changedData.setEvent(new EventRecord("", "changed", emptyList()));
         ServiceParameters serviceParameters = new ServiceParameters(changedData);
 
         when(companyNumberExtractor.extractFromUri(any())).thenThrow(NonRetryableException.class);
@@ -88,6 +109,7 @@ class AppointmentsChangeServiceTest {
         ResourceChangedData changedData = new ResourceChangedData();
         changedData.setResourceUri(RESOURCE_URI);
         changedData.setContextId(CONTEXT_ID);
+        changedData.setEvent(new EventRecord("", "changed", emptyList()));
         ServiceParameters serviceParameters = new ServiceParameters(changedData);
 
         when(companyNumberExtractor.extractFromUri(any())).thenReturn(COMPANY_NUMBER);
@@ -111,6 +133,7 @@ class AppointmentsChangeServiceTest {
         ResourceChangedData changedData = new ResourceChangedData();
         changedData.setResourceUri(RESOURCE_URI);
         changedData.setContextId(CONTEXT_ID);
+        changedData.setEvent(new EventRecord("", "changed", emptyList()));
         ServiceParameters serviceParameters = new ServiceParameters(changedData);
 
         when(companyNumberExtractor.extractFromUri(any())).thenReturn(COMPANY_NUMBER);

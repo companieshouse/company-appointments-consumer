@@ -33,7 +33,7 @@ public class MessageLoggingAspect {
     private static final Logger LOGGER = LoggerFactory.getLogger(Application.NAMESPACE);
 
     private static final String LOG_MESSAGE_RECEIVED = "Processing resource changed data message";
-    private static final String LOG_MESSAGE_PROCESSED = "Processed resource changes data message";
+    private static final String LOG_MESSAGE_PROCESSED = "Processed resource changed data message";
     private static final String EXCEPTION_MESSAGE = "%s exception thrown: %s";
 
     @Before("execution(* Consumer.consume(..))")

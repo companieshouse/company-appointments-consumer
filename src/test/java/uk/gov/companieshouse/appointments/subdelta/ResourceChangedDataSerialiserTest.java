@@ -33,7 +33,7 @@ class ResourceChangedDataSerialiserTest {
         // given
         ResourceChangedData changedData = new ResourceChangedData("resource_kind",
                 "resource_uri", "context_id", "resource_id", "data",
-                new EventRecord("", "", Collections.emptyList()));
+                new EventRecord("published_at", "event_type", Collections.emptyList()));
         ResourceChangedDataSerialiser serialiser = new ResourceChangedDataSerialiser();
 
         // when
@@ -48,7 +48,7 @@ class ResourceChangedDataSerialiserTest {
         // given
         ResourceChangedData changedData = new ResourceChangedData("resource_kind",
                 "resource_uri", "context_id", "resource_id", "data",
-                new EventRecord("", "", Collections.emptyList()));
+                new EventRecord("", "changed", Collections.emptyList()));
         ResourceChangedDataSerialiser serialiser = spy(new ResourceChangedDataSerialiser());
         doReturn(writer).when(serialiser).getDatumWriter();
         doThrow(IOException.class).when(writer).write(any(), any());

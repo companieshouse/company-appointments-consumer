@@ -10,6 +10,7 @@ import uk.gov.companieshouse.stream.ResourceChangedData;
 @Component
 class AppointmentsChangeService implements Service {
 
+    private static final String CHANGED = "changed";
     private final CompanyProfileClient companyProfileClient;
     private final AppointmentsClient appointmentsClient;
     private final CompanyNumberExtractor companyNumberExtractor;
@@ -24,15 +25,18 @@ class AppointmentsChangeService implements Service {
     @Override
     public void processMessage(ServiceParameters parameters) {
         ResourceChangedData changedData = parameters.getResourceChangedData();
-        String companyNumber = companyNumberExtractor.extractFromUri(changedData.getResourceUri());
 
-        Data companyProfile = companyProfileClient.fetchCompanyProfile(companyNumber,
-                        changedData.getContextId())
-                .orElseThrow(() -> new NonRetryableException(
-                        String.format("Company profile not found for %s", companyNumber)));
+        if (CHANGED.equals(changedData.getEvent().getType())) {
+            String companyNumber = companyNumberExtractor.extractFromUri(changedData.getResourceUri());
 
-        appointmentsClient.patchCompanyNameAndStatus(changedData.getResourceUri(),
-                companyProfile.getCompanyName(), companyProfile.getCompanyStatus(),
-                changedData.getContextId());
+            Data companyProfile = companyProfileClient.fetchCompanyProfile(companyNumber,
+                    changedData.getContextId())
+                    .orElseThrow(() -> new NonRetryableException(
+                            String.format("Company profile not found for %s", companyNumber)));
+
+            appointmentsClient.patchCompanyNameAndStatus(changedData.getResourceUri(),
+                    companyProfile.getCompanyName(), companyProfile.getCompanyStatus(),
+                    changedData.getContextId());
+        }
     }
 }
