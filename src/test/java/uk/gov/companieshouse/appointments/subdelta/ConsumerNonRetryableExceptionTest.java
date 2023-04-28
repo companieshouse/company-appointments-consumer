@@ -72,7 +72,7 @@ class ConsumerNonRetryableExceptionTest {
                 new EventRecord("", "", Collections.emptyList())), encoder);
 
         embeddedKafkaBroker.consumeFromAllEmbeddedTopics(testConsumer);
-        doThrow(NonRetryableException.class).when(service).processMessage(any());
+        doThrow(NonRetryableException.class).when(service).processChangedCompanyAppointment(any());
 
         //when
         testProducer.send(
@@ -92,6 +92,6 @@ class ConsumerNonRetryableExceptionTest {
                 "stream-company-officers-company-appointments-consumer-error"), is(0));
         assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
                 "stream-company-officers-company-appointments-consumer-invalid"), is(1));
-        verify(service).processMessage(any());
+        verify(service).processChangedCompanyAppointment(any());
     }
 }

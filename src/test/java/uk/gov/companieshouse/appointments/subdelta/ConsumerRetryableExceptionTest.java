@@ -73,7 +73,7 @@ class ConsumerRetryableExceptionTest {
                 new EventRecord("", "", Collections.emptyList())), encoder);
 
         embeddedKafkaBroker.consumeFromAllEmbeddedTopics(testConsumer);
-        doThrow(RetryableException.class).when(service).processMessage(any());
+        doThrow(RetryableException.class).when(service).processChangedCompanyAppointment(any());
 
         //when
         testProducer.send(
@@ -93,6 +93,6 @@ class ConsumerRetryableExceptionTest {
                 "stream-company-officers-company-appointments-consumer-error"), is(1));
         assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
                 "stream-company-officers-company-appointments-consumer-invalid"), is(0));
-        verify(service, times(5)).processMessage(any());
+        verify(service, times(5)).processChangedCompanyAppointment(any());
     }
 }

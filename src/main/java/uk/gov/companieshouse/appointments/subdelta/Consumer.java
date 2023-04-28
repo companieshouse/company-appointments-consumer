@@ -44,9 +44,9 @@ public class Consumer {
             fixedDelayTopicStrategy = FixedDelayStrategy.SINGLE_TOPIC,
             include = RetryableException.class
     )
-    public void consume(Message<ResourceChangedData> message) {
+    public void consumeOfficersStream(Message<ResourceChangedData> message) {
         try {
-            service.processMessage(new ServiceParameters(message.getPayload()));
+            service.processChangedCompanyAppointment(new ServiceParameters(message.getPayload()));
         } catch (RetryableException exception) {
             messageFlags.setRetryable(true);
             throw exception;
@@ -76,7 +76,7 @@ public class Consumer {
     )
     public void consumeProfileStream(Message<ResourceChangedData> message) {
         try {
-            service.processMessageForExistingAppointment(new ServiceParameters(message.getPayload()));
+            service.processChangedCompanyProfile(new ServiceParameters(message.getPayload()));
         } catch (RetryableException exception) {
             messageFlags.setRetryable(true);
             throw exception;

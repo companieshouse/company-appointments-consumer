@@ -90,6 +90,6 @@ class ConsumerPositiveTest {
                 "stream-company-officers-company-appointments-consumer-error"), is(0));
         assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
                 "stream-company-officers-company-appointments-consumer-invalid"), is(0));
-        verify(service).processMessage(any());
+        verify(service).processChangedCompanyAppointment(any());
     }
 }

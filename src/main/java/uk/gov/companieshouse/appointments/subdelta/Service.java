@@ -10,7 +10,7 @@ public interface Service {
      *
      * @param parameters Any parameters required when processing the message.
      */
-    void processMessage(ServiceParameters parameters);
+    void processChangedCompanyAppointment(ServiceParameters parameters);
 
-    void processMessageForExistingAppointment(ServiceParameters parameters);
+    void processChangedCompanyProfile(ServiceParameters parameters);
 }
