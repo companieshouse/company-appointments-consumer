@@ -41,4 +41,24 @@ public class AppointmentsClient {
             responseHandler.handle(String.format(FAILED_MSG, resourceUri, contextId), ex);
         }
     }
+
+    public void patchExistingCompanyNameAndStatus(String resourceUri, String companyName,
+                                                  String status, String contextId) {
+        InternalApiClient client = internalApiClientFactory.get();
+
+        try {
+            client.privateDeltaResourceHandler()
+                    .patchExistingCompanyAppointment(resourceUri, new PatchAppointmentNameStatusApi()
+                            .companyName(companyName)
+                            .companyStatus(status))
+                    .execute();
+        } catch (ApiErrorResponseException ex) {
+            responseHandler.handle(
+                    String.format(ERROR_MSG, ex.getStatusCode(), resourceUri, contextId), ex);
+        } catch (IllegalArgumentException ex) {
+            responseHandler.handle(String.format(FAILED_MSG, resourceUri, contextId), ex);
+        } catch (URIValidationException ex) {
+            responseHandler.handle(String.format(FAILED_MSG, resourceUri, contextId), ex);
+        }
+    }
 }

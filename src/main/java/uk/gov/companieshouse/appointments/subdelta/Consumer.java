@@ -52,4 +52,34 @@ public class Consumer {
             throw exception;
         }
     }
+
+    /**
+     * Consume a message from the stream-company-profile Kafka topic.
+     *
+     * @param message A message containing a payload.
+     */
+    @KafkaListener(
+            id = "${consumer.group_id}",
+            containerFactory = "kafkaListenerContainerFactory",
+            topics = "${consumer.profile.topic}",
+            groupId = "${consumer.group_id}"
+    )
+    @RetryableTopic(
+            attempts = "${consumer.max_attempts}",
+            autoCreateTopics = "false",
+            backoff = @Backoff(delayExpression = "${consumer.backoff_delay}"),
+            retryTopicSuffix = "-${consumer.group_id}-retry",
+            dltTopicSuffix = "-${consumer.group_id}-error",
+            dltStrategy = DltStrategy.FAIL_ON_ERROR,
+            fixedDelayTopicStrategy = FixedDelayStrategy.SINGLE_TOPIC,
+            include = RetryableException.class
+    )
+    public void consumeProfileStream(Message<ResourceChangedData> message) {
+        try {
+            service.processMessageForExistingAppointment(new ServiceParameters(message.getPayload()));
+        } catch (RetryableException exception) {
+            messageFlags.setRetryable(true);
+            throw exception;
+        }
+    }
 }

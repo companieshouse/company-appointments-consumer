@@ -39,4 +39,19 @@ class AppointmentsChangeService implements Service {
                     changedData.getContextId());
         }
     }
+
+    @Override
+    public void processMessageForExistingAppointment(ServiceParameters parameters) {
+        ResourceChangedData changedData = parameters.getResourceChangedData();
+        String companyNumber = companyNumberExtractor.extractFromUri(changedData.getResourceUri());
+
+        Data companyProfile = companyProfileClient.fetchCompanyProfile(companyNumber,
+                        changedData.getContextId())
+                .orElseThrow(() -> new NonRetryableException(
+                        String.format("Company profile not found for %s", companyNumber)));
+
+        appointmentsClient.patchExistingCompanyNameAndStatus(changedData.getResourceUri(),
+                companyProfile.getCompanyName(), companyProfile.getCompanyStatus(),
+                changedData.getContextId());
+    }
 }

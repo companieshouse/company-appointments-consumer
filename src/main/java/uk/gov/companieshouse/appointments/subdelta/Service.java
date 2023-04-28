@@ -11,4 +11,6 @@ public interface Service {
      * @param parameters Any parameters required when processing the message.
      */
     void processMessage(ServiceParameters parameters);
+
+    void processMessageForExistingAppointment(ServiceParameters parameters);
 }
