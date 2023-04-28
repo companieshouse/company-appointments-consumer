@@ -2,8 +2,6 @@ package uk.gov.companieshouse.appointments.subdelta;
 
 import java.util.Map;
 import java.util.function.Supplier;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;

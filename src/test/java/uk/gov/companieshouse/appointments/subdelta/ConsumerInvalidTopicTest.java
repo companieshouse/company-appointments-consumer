@@ -30,7 +30,11 @@ import org.springframework.test.context.ActiveProfiles;
         topics = {"stream-company-officers",
                 "stream-company-officers-company-appointments-consumer-retry",
                 "stream-company-officers-company-appointments-consumer-error",
-                "stream-company-officers-company-appointments-consumer-invalid"},
+                "stream-company-officers-company-appointments-consumer-invalid",
+                "stream-company-profile",
+                "stream-company-profile-company-appointments-consumer-retry",
+                "stream-company-profile-company-appointments-consumer-error",
+                "stream-company-profile-company-appointments-consumer-invalid"},
         controlledShutdown = true,
         partitions = 1
 )

@@ -38,7 +38,11 @@ import uk.gov.companieshouse.stream.ResourceChangedData;
         topics = {"stream-company-officers",
                 "stream-company-officers-company-appointments-consumer-retry",
                 "stream-company-officers-company-appointments-consumer-error",
-                "stream-company-officers-company-appointments-consumer-invalid"},
+                "stream-company-officers-company-appointments-consumer-invalid",
+                "stream-company-profile",
+                "stream-company-profile-company-appointments-consumer-retry",
+                "stream-company-profile-company-appointments-consumer-error",
+                "stream-company-profile-company-appointments-consumer-invalid"},
         controlledShutdown = true,
         partitions = 1
 )
@@ -59,20 +63,19 @@ class ConsumerNonRetryableExceptionTest {
     private CountDownLatch latch;
 
     @MockBean
-    private Service service;
+    private ServiceRouter router;
 
     @Test
     void testRepublishToInvalidMessageTopicIfNonRetryableExceptionThrown() throws Exception {
         //given
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Encoder encoder = EncoderFactory.get().directBinaryEncoder(outputStream, null);
-        DatumWriter<ResourceChangedData> writer = new ReflectDatumWriter<>(
-                ResourceChangedData.class);
+        DatumWriter<ResourceChangedData> writer = new ReflectDatumWriter<>(ResourceChangedData.class);
         writer.write(new ResourceChangedData("", "", "", "", "{}",
                 new EventRecord("", "", Collections.emptyList())), encoder);
 
         embeddedKafkaBroker.consumeFromAllEmbeddedTopics(testConsumer);
-        doThrow(NonRetryableException.class).when(service).processChangedCompanyAppointment(any());
+        doThrow(NonRetryableException.class).when(router).route(any());
 
         //when
         testProducer.send(
@@ -92,6 +95,6 @@ class ConsumerNonRetryableExceptionTest {
                 "stream-company-officers-company-appointments-consumer-error"), is(0));
         assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
                 "stream-company-officers-company-appointments-consumer-invalid"), is(1));
-        verify(service).processChangedCompanyAppointment(any());
+        verify(router).route(any());
     }
 }

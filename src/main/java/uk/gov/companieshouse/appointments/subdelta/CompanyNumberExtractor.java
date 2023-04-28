@@ -1,11 +1,11 @@
 package uk.gov.companieshouse.appointments.subdelta;
 
+import static uk.gov.companieshouse.appointments.subdelta.Application.LOGGER;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import uk.gov.companieshouse.logging.Logger;
-import uk.gov.companieshouse.logging.LoggerFactory;
 
 @Component
 public class CompanyNumberExtractor {
@@ -16,7 +16,6 @@ public class CompanyNumberExtractor {
             "Could not extract company number from empty or null resource uri";
     private static final String EXTRACTION_ERROR =
             "Could not extract company number from resource URI: ";
-    private static final Logger LOGGER = LoggerFactory.getLogger(Application.NAMESPACE);
 
     public String extractFromUri(String uri) {
         if (!StringUtils.hasText(uri)) {

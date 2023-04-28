@@ -32,12 +32,16 @@ import uk.gov.companieshouse.stream.EventRecord;
 import uk.gov.companieshouse.stream.ResourceChangedData;
 
 @SpringBootTest(classes = Application.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @EmbeddedKafka(
         topics = {"stream-company-officers",
                 "stream-company-officers-company-appointments-consumer-retry",
                 "stream-company-officers-company-appointments-consumer-error",
-                "stream-company-officers-company-appointments-consumer-invalid"},
+                "stream-company-officers-company-appointments-consumer-invalid",
+                "stream-company-profile",
+                "stream-company-profile-company-appointments-consumer-retry",
+                "stream-company-profile-company-appointments-consumer-error",
+                "stream-company-profile-company-appointments-consumer-invalid"},
         controlledShutdown = true,
         partitions = 1
 )
@@ -58,15 +62,14 @@ class ConsumerPositiveTest {
     private CountDownLatch latch;
 
     @MockBean
-    private Service service;
+    private ServiceRouter router;
 
     @Test
-    void testConsumeFromMainTopic() throws Exception {
+    void testConsumeFromStreamCompanyOfficersTopic() throws Exception {
         //given
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Encoder encoder = EncoderFactory.get().directBinaryEncoder(outputStream, null);
-        DatumWriter<ResourceChangedData> writer = new ReflectDatumWriter<>(
-                ResourceChangedData.class);
+        DatumWriter<ResourceChangedData> writer = new ReflectDatumWriter<>(ResourceChangedData.class);
         writer.write(new ResourceChangedData("", "", "", "", "{}",
                 new EventRecord("", "", Collections.emptyList())), encoder);
 
@@ -90,6 +93,38 @@ class ConsumerPositiveTest {
                 "stream-company-officers-company-appointments-consumer-error"), is(0));
         assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
                 "stream-company-officers-company-appointments-consumer-invalid"), is(0));
-        verify(service).processChangedCompanyAppointment(any());
+        verify(router).route(any());
+    }
+
+    @Test
+    void testConsumeFromStreamCompanyProfileTopic() throws Exception {
+        //given
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        Encoder encoder = EncoderFactory.get().directBinaryEncoder(outputStream, null);
+        DatumWriter<ResourceChangedData> writer = new ReflectDatumWriter<>(ResourceChangedData.class);
+        writer.write(new ResourceChangedData("", "", "", "", "{}",
+                new EventRecord("", "", Collections.emptyList())), encoder);
+
+        embeddedKafkaBroker.consumeFromAllEmbeddedTopics(testConsumer);
+
+        //when
+        testProducer.send(
+                new ProducerRecord<>("stream-company-profile", 0, System.currentTimeMillis(),
+                        "key", outputStream.toByteArray()));
+        if (!latch.await(5L, TimeUnit.SECONDS)) {
+            fail("Timed out waiting for latch");
+        }
+
+        //then
+        ConsumerRecords<?, ?> consumerRecords = KafkaTestUtils.getRecords(testConsumer, 10000L, 1);
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, "stream-company-profile"),
+                is(1));
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
+                "stream-company-profile-company-appointments-consumer-retry"), is(0));
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
+                "stream-company-profile-company-appointments-consumer-error"), is(0));
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
+                "stream-company-profile-company-appointments-consumer-invalid"), is(0));
+        verify(router).route(any());
     }
 }

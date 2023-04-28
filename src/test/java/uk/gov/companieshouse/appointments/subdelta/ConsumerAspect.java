@@ -16,7 +16,7 @@ public class ConsumerAspect {
         this.latch = latch;
     }
 
-    @After("execution(* Consumer.consumeOfficersStream(..))")
+    @After("execution(* Consumer.consume(..))")
     void afterConsume(JoinPoint joinPoint) {
         latch.countDown();
     }

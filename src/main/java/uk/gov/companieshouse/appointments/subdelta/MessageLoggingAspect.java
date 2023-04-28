@@ -1,5 +1,7 @@
 package uk.gov.companieshouse.appointments.subdelta;
 
+import static uk.gov.companieshouse.appointments.subdelta.Application.LOGGER;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -11,8 +13,6 @@ import org.aspectj.lang.annotation.Before;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
-import uk.gov.companieshouse.logging.Logger;
-import uk.gov.companieshouse.logging.LoggerFactory;
 
 /**
  * Logs message details before and after it has been processed by the
@@ -29,8 +29,6 @@ import uk.gov.companieshouse.logging.LoggerFactory;
 @Component
 @Aspect
 public class MessageLoggingAspect {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(Application.NAMESPACE);
 
     private static final String LOG_MESSAGE_RECEIVED = "Processing resource changed data message";
     private static final String LOG_MESSAGE_PROCESSED = "Processed resource changed data message";

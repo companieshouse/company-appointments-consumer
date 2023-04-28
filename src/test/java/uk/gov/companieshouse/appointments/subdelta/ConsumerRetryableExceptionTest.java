@@ -28,18 +28,20 @@ import org.springframework.context.annotation.Import;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.companieshouse.stream.EventRecord;
 import uk.gov.companieshouse.stream.ResourceChangedData;
 
 @SpringBootTest(classes = Application.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @EmbeddedKafka(
         topics = {"stream-company-officers",
                 "stream-company-officers-company-appointments-consumer-retry",
                 "stream-company-officers-company-appointments-consumer-error",
-                "stream-company-officers-company-appointments-consumer-invalid"},
+                "stream-company-officers-company-appointments-consumer-invalid",
+                "stream-company-profile",
+                "stream-company-profile-company-appointments-consumer-retry",
+                "stream-company-profile-company-appointments-consumer-error",
+                "stream-company-profile-company-appointments-consumer-invalid"},
         controlledShutdown = true,
         partitions = 1
 )
@@ -60,20 +62,19 @@ class ConsumerRetryableExceptionTest {
     private CountDownLatch latch;
 
     @MockBean
-    private Service service;
+    private ServiceRouter router;
 
     @Test
     void testRepublishToErrorTopicThroughRetryTopics() throws Exception {
         //given
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Encoder encoder = EncoderFactory.get().directBinaryEncoder(outputStream, null);
-        DatumWriter<ResourceChangedData> writer = new ReflectDatumWriter<>(
-                ResourceChangedData.class);
+        DatumWriter<ResourceChangedData> writer = new ReflectDatumWriter<>(ResourceChangedData.class);
         writer.write(new ResourceChangedData("", "", "", "", "{}",
                 new EventRecord("", "", Collections.emptyList())), encoder);
 
         embeddedKafkaBroker.consumeFromAllEmbeddedTopics(testConsumer);
-        doThrow(RetryableException.class).when(service).processChangedCompanyAppointment(any());
+        doThrow(RetryableException.class).when(router).route(any());
 
         //when
         testProducer.send(
@@ -93,6 +94,6 @@ class ConsumerRetryableExceptionTest {
                 "stream-company-officers-company-appointments-consumer-error"), is(1));
         assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
                 "stream-company-officers-company-appointments-consumer-invalid"), is(0));
-        verify(service, times(5)).processChangedCompanyAppointment(any());
+        verify(router, times(5)).route(any());
     }
 }
