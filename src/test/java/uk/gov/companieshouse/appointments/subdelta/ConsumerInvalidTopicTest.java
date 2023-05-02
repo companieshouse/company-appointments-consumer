@@ -2,6 +2,14 @@ package uk.gov.companieshouse.appointments.subdelta;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static uk.gov.companieshouse.appointments.subdelta.TestUtils.STREAM_COMPANY_OFFICERS_ERROR_TOPIC;
+import static uk.gov.companieshouse.appointments.subdelta.TestUtils.STREAM_COMPANY_OFFICERS_INVALID_TOPIC;
+import static uk.gov.companieshouse.appointments.subdelta.TestUtils.STREAM_COMPANY_OFFICERS_RETRY_TOPIC;
+import static uk.gov.companieshouse.appointments.subdelta.TestUtils.STREAM_COMPANY_OFFICERS_TOPIC;
+import static uk.gov.companieshouse.appointments.subdelta.TestUtils.STREAM_COMPANY_PROFILE_ERROR_TOPIC;
+import static uk.gov.companieshouse.appointments.subdelta.TestUtils.STREAM_COMPANY_PROFILE_INVALID_TOPIC;
+import static uk.gov.companieshouse.appointments.subdelta.TestUtils.STREAM_COMPANY_PROFILE_RETRY_TOPIC;
+import static uk.gov.companieshouse.appointments.subdelta.TestUtils.STREAM_COMPANY_PROFILE_TOPIC;
 
 import java.io.ByteArrayOutputStream;
 import java.util.concurrent.Future;
@@ -27,14 +35,14 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest(classes = Application.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @EmbeddedKafka(
-        topics = {"stream-company-officers",
-                "stream-company-officers-company-appointments-consumer-retry",
-                "stream-company-officers-company-appointments-consumer-error",
-                "stream-company-officers-company-appointments-consumer-invalid",
-                "stream-company-profile",
-                "stream-company-profile-company-appointments-consumer-retry",
-                "stream-company-profile-company-appointments-consumer-error",
-                "stream-company-profile-company-appointments-consumer-invalid"},
+        topics = {STREAM_COMPANY_OFFICERS_TOPIC,
+                STREAM_COMPANY_OFFICERS_RETRY_TOPIC,
+                STREAM_COMPANY_OFFICERS_ERROR_TOPIC,
+                STREAM_COMPANY_OFFICERS_INVALID_TOPIC,
+                STREAM_COMPANY_PROFILE_TOPIC,
+                STREAM_COMPANY_PROFILE_RETRY_TOPIC,
+                STREAM_COMPANY_PROFILE_ERROR_TOPIC,
+                STREAM_COMPANY_PROFILE_INVALID_TOPIC},
         controlledShutdown = true,
         partitions = 1
 )
@@ -63,19 +71,19 @@ class ConsumerInvalidTopicTest {
 
         //when
         Future<RecordMetadata> future = testProducer.send(
-                new ProducerRecord<>("stream-company-officers",
+                new ProducerRecord<>(STREAM_COMPANY_OFFICERS_TOPIC,
                         0, System.currentTimeMillis(), "key", outputStream.toByteArray()));
         future.get();
         ConsumerRecords<?, ?> consumerRecords = KafkaTestUtils.getRecords(testConsumer, 10000L, 2);
 
         //then
-        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, "stream-company-officers"),
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, STREAM_COMPANY_OFFICERS_TOPIC),
                 is(1));
         assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
-                "stream-company-officers-company-appointments-consumer-retry"), is(0));
+                STREAM_COMPANY_OFFICERS_RETRY_TOPIC), is(0));
         assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
-                "stream-company-officers-company-appointments-consumer-error"), is(0));
+                STREAM_COMPANY_OFFICERS_ERROR_TOPIC), is(0));
         assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
-                "stream-company-officers-company-appointments-consumer-invalid"), is(1));
+                STREAM_COMPANY_OFFICERS_INVALID_TOPIC), is(1));
     }
 }

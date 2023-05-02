@@ -7,6 +7,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static uk.gov.companieshouse.appointments.subdelta.TestUtils.STREAM_COMPANY_OFFICERS_ERROR_TOPIC;
+import static uk.gov.companieshouse.appointments.subdelta.TestUtils.STREAM_COMPANY_OFFICERS_INVALID_TOPIC;
+import static uk.gov.companieshouse.appointments.subdelta.TestUtils.STREAM_COMPANY_OFFICERS_RETRY_TOPIC;
+import static uk.gov.companieshouse.appointments.subdelta.TestUtils.STREAM_COMPANY_OFFICERS_TOPIC;
+import static uk.gov.companieshouse.appointments.subdelta.TestUtils.STREAM_COMPANY_PROFILE_ERROR_TOPIC;
+import static uk.gov.companieshouse.appointments.subdelta.TestUtils.STREAM_COMPANY_PROFILE_INVALID_TOPIC;
+import static uk.gov.companieshouse.appointments.subdelta.TestUtils.STREAM_COMPANY_PROFILE_RETRY_TOPIC;
+import static uk.gov.companieshouse.appointments.subdelta.TestUtils.STREAM_COMPANY_PROFILE_TOPIC;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Collections;
@@ -34,14 +42,14 @@ import uk.gov.companieshouse.stream.ResourceChangedData;
 
 @SpringBootTest(classes = Application.class)
 @EmbeddedKafka(
-        topics = {"stream-company-officers",
-                "stream-company-officers-company-appointments-consumer-retry",
-                "stream-company-officers-company-appointments-consumer-error",
-                "stream-company-officers-company-appointments-consumer-invalid",
-                "stream-company-profile",
-                "stream-company-profile-company-appointments-consumer-retry",
-                "stream-company-profile-company-appointments-consumer-error",
-                "stream-company-profile-company-appointments-consumer-invalid"},
+        topics = {STREAM_COMPANY_OFFICERS_TOPIC,
+                STREAM_COMPANY_OFFICERS_RETRY_TOPIC,
+                STREAM_COMPANY_OFFICERS_ERROR_TOPIC,
+                STREAM_COMPANY_OFFICERS_INVALID_TOPIC,
+                STREAM_COMPANY_PROFILE_TOPIC,
+                STREAM_COMPANY_PROFILE_RETRY_TOPIC,
+                STREAM_COMPANY_PROFILE_ERROR_TOPIC,
+                STREAM_COMPANY_PROFILE_INVALID_TOPIC},
         controlledShutdown = true,
         partitions = 1
 )
@@ -78,7 +86,7 @@ class ConsumerRetryableExceptionTest {
 
         //when
         testProducer.send(
-                new ProducerRecord<>("stream-company-officers", 0, System.currentTimeMillis(),
+                new ProducerRecord<>(STREAM_COMPANY_OFFICERS_TOPIC, 0, System.currentTimeMillis(),
                         "key", outputStream.toByteArray()));
         if (!latch.await(5L, TimeUnit.SECONDS)) {
             fail("Timed out waiting for latch");
@@ -86,14 +94,14 @@ class ConsumerRetryableExceptionTest {
 
         //then
         ConsumerRecords<?, ?> consumerRecords = KafkaTestUtils.getRecords(testConsumer, 10000L, 6);
-        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, "stream-company-officers"),
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, STREAM_COMPANY_OFFICERS_TOPIC),
                 is(1));
         assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
-                "stream-company-officers-company-appointments-consumer-retry"), is(4));
+                STREAM_COMPANY_OFFICERS_RETRY_TOPIC), is(4));
         assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
-                "stream-company-officers-company-appointments-consumer-error"), is(1));
+                STREAM_COMPANY_OFFICERS_ERROR_TOPIC), is(1));
         assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
-                "stream-company-officers-company-appointments-consumer-invalid"), is(0));
+                STREAM_COMPANY_OFFICERS_INVALID_TOPIC), is(0));
         verify(router, times(5)).route(any());
     }
 }
