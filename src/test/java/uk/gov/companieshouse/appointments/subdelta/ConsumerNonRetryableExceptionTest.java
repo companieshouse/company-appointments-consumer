@@ -41,7 +41,7 @@ import uk.gov.companieshouse.stream.EventRecord;
 import uk.gov.companieshouse.stream.ResourceChangedData;
 
 @SpringBootTest(classes = Application.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @EmbeddedKafka(
         topics = {STREAM_COMPANY_OFFICERS_TOPIC,
                 STREAM_COMPANY_OFFICERS_RETRY_TOPIC,
@@ -74,7 +74,7 @@ class ConsumerNonRetryableExceptionTest {
     private ServiceRouter router;
 
     @Test
-    void testRepublishToInvalidMessageTopicIfNonRetryableExceptionThrown() throws Exception {
+    void testRepublishToCompanyOfficersInvalidMessageTopicIfNonRetryableExceptionThrown() throws Exception {
         //given
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Encoder encoder = EncoderFactory.get().directBinaryEncoder(outputStream, null);
@@ -103,6 +103,39 @@ class ConsumerNonRetryableExceptionTest {
                 STREAM_COMPANY_OFFICERS_ERROR_TOPIC), is(0));
         assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
                 STREAM_COMPANY_OFFICERS_INVALID_TOPIC), is(1));
+        verify(router).route(any());
+    }
+
+    @Test
+    void testRepublishToCompanyProfileInvalidMessageTopicIfNonRetryableExceptionThrown() throws Exception {
+        //given
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        Encoder encoder = EncoderFactory.get().directBinaryEncoder(outputStream, null);
+        DatumWriter<ResourceChangedData> writer = new ReflectDatumWriter<>(ResourceChangedData.class);
+        writer.write(new ResourceChangedData("", "", "", "", "{}",
+                new EventRecord("", "", Collections.emptyList())), encoder);
+
+        embeddedKafkaBroker.consumeFromAllEmbeddedTopics(testConsumer);
+        doThrow(NonRetryableException.class).when(router).route(any());
+
+        //when
+        testProducer.send(
+                new ProducerRecord<>(STREAM_COMPANY_PROFILE_TOPIC, 0, System.currentTimeMillis(),
+                        "key", outputStream.toByteArray()));
+        if (!latch.await(5L, TimeUnit.SECONDS)) {
+            fail("Timed out waiting for latch");
+        }
+        ConsumerRecords<?, ?> consumerRecords = KafkaTestUtils.getRecords(testConsumer, 10000L, 2);
+
+        //then
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, STREAM_COMPANY_PROFILE_TOPIC),
+                is(1));
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
+                STREAM_COMPANY_PROFILE_RETRY_TOPIC), is(0));
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
+                STREAM_COMPANY_PROFILE_ERROR_TOPIC), is(0));
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
+                STREAM_COMPANY_PROFILE_INVALID_TOPIC), is(1));
         verify(router).route(any());
     }
 }

@@ -33,7 +33,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest(classes = Application.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @EmbeddedKafka(
         topics = {STREAM_COMPANY_OFFICERS_TOPIC,
                 STREAM_COMPANY_OFFICERS_RETRY_TOPIC,
@@ -60,7 +60,7 @@ class ConsumerInvalidTopicTest {
     private KafkaProducer<String, byte[]> testProducer;
 
     @Test
-    void testPublishToInvalidMessageTopicIfInvalidDataDeserialised() throws Exception {
+    void testPublishToCompanyOfficersInvalidMessageTopicIfInvalidDataDeserialised() throws Exception {
         //given
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Encoder encoder = EncoderFactory.get().directBinaryEncoder(outputStream, null);
@@ -85,5 +85,33 @@ class ConsumerInvalidTopicTest {
                 STREAM_COMPANY_OFFICERS_ERROR_TOPIC), is(0));
         assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
                 STREAM_COMPANY_OFFICERS_INVALID_TOPIC), is(1));
+    }
+
+    @Test
+    void testPublishToCompanyProfileInvalidMessageTopicIfInvalidDataDeserialised() throws Exception {
+        //given
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        Encoder encoder = EncoderFactory.get().directBinaryEncoder(outputStream, null);
+        DatumWriter<String> writer = new ReflectDatumWriter<>(String.class);
+        writer.write("bad data", encoder);
+
+        embeddedKafkaBroker.consumeFromAllEmbeddedTopics(testConsumer);
+
+        //when
+        Future<RecordMetadata> future = testProducer.send(
+                new ProducerRecord<>(STREAM_COMPANY_PROFILE_TOPIC,
+                        0, System.currentTimeMillis(), "key", outputStream.toByteArray()));
+        future.get();
+        ConsumerRecords<?, ?> consumerRecords = KafkaTestUtils.getRecords(testConsumer, 10000L, 2);
+
+        //then
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, STREAM_COMPANY_PROFILE_TOPIC),
+                is(1));
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
+                STREAM_COMPANY_PROFILE_RETRY_TOPIC), is(0));
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
+                STREAM_COMPANY_PROFILE_ERROR_TOPIC), is(0));
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
+                STREAM_COMPANY_PROFILE_INVALID_TOPIC), is(1));
     }
 }
