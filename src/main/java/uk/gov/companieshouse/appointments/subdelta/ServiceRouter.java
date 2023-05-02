@@ -1,14 +1,17 @@
 package uk.gov.companieshouse.appointments.subdelta;
 
-import static uk.gov.companieshouse.appointments.subdelta.Application.LOGGER;
+import static uk.gov.companieshouse.appointments.subdelta.Application.NAMESPACE;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import uk.gov.companieshouse.logging.Logger;
+import uk.gov.companieshouse.logging.LoggerFactory;
 import uk.gov.companieshouse.stream.ResourceChangedData;
 
 @Component
 public class ServiceRouter {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(NAMESPACE);
     private static final String NOT_PROCESSED_MESSAGE = "Message was not processed as event type was not 'changed'";
     private static final String EVENT_TYPE_CHANGED = "changed";
 

@@ -1,9 +1,11 @@
 package uk.gov.companieshouse.appointments.subdelta;
 
-import static uk.gov.companieshouse.appointments.subdelta.Application.LOGGER;
+import static uk.gov.companieshouse.appointments.subdelta.Application.NAMESPACE;
 
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.api.company.Data;
+import uk.gov.companieshouse.logging.Logger;
+import uk.gov.companieshouse.logging.LoggerFactory;
 import uk.gov.companieshouse.stream.ResourceChangedData;
 
 /**
@@ -12,6 +14,7 @@ import uk.gov.companieshouse.stream.ResourceChangedData;
 @Component
 class CompanyAppointmentChangedService implements Service {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(NAMESPACE);
     private static final String COMPANY_PROFILE_NOT_FOUND_MESSAGE = "Company profile not found for %s";
 
     private final CompanyProfileClient companyProfileClient;

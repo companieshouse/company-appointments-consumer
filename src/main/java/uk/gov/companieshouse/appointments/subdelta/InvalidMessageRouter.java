@@ -4,7 +4,7 @@ import static org.springframework.kafka.support.KafkaHeaders.EXCEPTION_MESSAGE;
 import static org.springframework.kafka.support.KafkaHeaders.ORIGINAL_OFFSET;
 import static org.springframework.kafka.support.KafkaHeaders.ORIGINAL_PARTITION;
 import static org.springframework.kafka.support.KafkaHeaders.ORIGINAL_TOPIC;
-import static uk.gov.companieshouse.appointments.subdelta.Application.LOGGER;
+import static uk.gov.companieshouse.appointments.subdelta.Application.NAMESPACE;
 
 import java.math.BigInteger;
 import java.util.Collections;
@@ -13,6 +13,8 @@ import java.util.Optional;
 import org.apache.kafka.clients.producer.ProducerInterceptor;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import uk.gov.companieshouse.logging.Logger;
+import uk.gov.companieshouse.logging.LoggerFactory;
 import uk.gov.companieshouse.stream.EventRecord;
 import uk.gov.companieshouse.stream.ResourceChangedData;
 
@@ -21,6 +23,8 @@ import uk.gov.companieshouse.stream.ResourceChangedData;
  * message processing.
  */
 public class InvalidMessageRouter implements ProducerInterceptor<String, ResourceChangedData> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(NAMESPACE);
 
     private MessageFlags messageFlags;
     private String invalidMessageTopic;

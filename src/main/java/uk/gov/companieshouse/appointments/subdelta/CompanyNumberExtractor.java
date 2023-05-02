@@ -1,15 +1,18 @@
 package uk.gov.companieshouse.appointments.subdelta;
 
-import static uk.gov.companieshouse.appointments.subdelta.Application.LOGGER;
+import static uk.gov.companieshouse.appointments.subdelta.Application.NAMESPACE;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import uk.gov.companieshouse.logging.Logger;
+import uk.gov.companieshouse.logging.LoggerFactory;
 
 @Component
 public class CompanyNumberExtractor {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(NAMESPACE);
     private static final Pattern EXTRACT_COMPANY_NUMBER_PATTERN =
             Pattern.compile("(?<=company/)([a-zA-Z0-9]{6,10})(?=/.*)");
     private static final String NULL_EMPTY_URI =
