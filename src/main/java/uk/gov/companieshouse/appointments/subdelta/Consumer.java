@@ -7,14 +7,13 @@ import org.springframework.kafka.retrytopic.FixedDelayStrategy;
 import org.springframework.messaging.Message;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Component;
+import uk.gov.companieshouse.stream.ResourceChangedData;
 
 /**
  * Consumes messages from the configured main Kafka topic.
  */
 @Component
 public class Consumer {
-
-    // TODO: Listening to two streams so need to adjust paths to appropriate application.properties variables
 
     private final Service service;
     private final MessageFlags messageFlags;
@@ -32,7 +31,7 @@ public class Consumer {
     @KafkaListener(
             id = "${consumer.group_id}",
             containerFactory = "kafkaListenerContainerFactory",
-            topics = "${consumer.topic}",
+            topics = "${consumer.officers.topic}",
             groupId = "${consumer.group_id}"
     )
     @RetryableTopic(
@@ -45,12 +44,12 @@ public class Consumer {
             fixedDelayTopicStrategy = FixedDelayStrategy.SINGLE_TOPIC,
             include = RetryableException.class
     )
-    public void consume(Message<String> message) {
+    public void consume(Message<ResourceChangedData> message) {
         try {
             service.processMessage(new ServiceParameters(message.getPayload()));
-        } catch (RetryableException e) {
+        } catch (RetryableException exception) {
             messageFlags.setRetryable(true);
-            throw e;
+            throw exception;
         }
     }
 }

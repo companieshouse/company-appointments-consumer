@@ -1,5 +1,20 @@
 package uk.gov.companieshouse.appointments.subdelta;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+
+import java.io.ByteArrayOutputStream;
+import java.util.Collections;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import org.apache.avro.io.DatumWriter;
+import org.apache.avro.io.Encoder;
+import org.apache.avro.io.EncoderFactory;
+import org.apache.avro.reflect.ReflectDatumWriter;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -14,26 +29,19 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
+import uk.gov.companieshouse.stream.EventRecord;
+import uk.gov.companieshouse.stream.ResourceChangedData;
 
 @SpringBootTest(classes = Application.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @EmbeddedKafka(
-        topics = {"echo", "echo-echo-consumer-retry", "echo-echo-consumer-error", "echo-echo-consumer-invalid"},
+        topics = {"stream-company-officers",
+                "stream-company-officers-company-appointments-consumer-retry",
+                "stream-company-officers-company-appointments-consumer-error",
+                "stream-company-officers-company-appointments-consumer-invalid"},
         controlledShutdown = true,
         partitions = 1
 )
-@TestPropertySource(locations = "classpath:application-test_main_nonretryable.properties")
 @Import(TestConfig.class)
 @ActiveProfiles("test_main_nonretryable")
 class ConsumerNonRetryableExceptionTest {
@@ -42,10 +50,10 @@ class ConsumerNonRetryableExceptionTest {
     private EmbeddedKafkaBroker embeddedKafkaBroker;
 
     @Autowired
-    private KafkaConsumer<String, String> testConsumer;
+    private KafkaConsumer<String, byte[]> testConsumer;
 
     @Autowired
-    private KafkaProducer<String, String> testProducer;
+    private KafkaProducer<String, byte[]> testProducer;
 
     @Autowired
     private CountDownLatch latch;
@@ -54,23 +62,36 @@ class ConsumerNonRetryableExceptionTest {
     private Service service;
 
     @Test
-    void testRepublishToInvalidMessageTopicIfNonRetryableExceptionThrown() throws InterruptedException {
+    void testRepublishToInvalidMessageTopicIfNonRetryableExceptionThrown() throws Exception {
         //given
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        Encoder encoder = EncoderFactory.get().directBinaryEncoder(outputStream, null);
+        DatumWriter<ResourceChangedData> writer = new ReflectDatumWriter<>(
+                ResourceChangedData.class);
+        writer.write(new ResourceChangedData("", "", "", "", "{}",
+                new EventRecord("", "", Collections.emptyList())), encoder);
+
         embeddedKafkaBroker.consumeFromAllEmbeddedTopics(testConsumer);
         doThrow(NonRetryableException.class).when(service).processMessage(any());
 
         //when
-        testProducer.send(new ProducerRecord<>("echo", 0, System.currentTimeMillis(), "key", "value"));
-        if (!latch.await(30L, TimeUnit.SECONDS)) {
+        testProducer.send(
+                new ProducerRecord<>("stream-company-officers", 0, System.currentTimeMillis(),
+                        "key", outputStream.toByteArray()));
+        if (!latch.await(5L, TimeUnit.SECONDS)) {
             fail("Timed out waiting for latch");
         }
         ConsumerRecords<?, ?> consumerRecords = KafkaTestUtils.getRecords(testConsumer, 10000L, 2);
 
         //then
-        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, "echo"), is(1));
-        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, "echo-echo-consumer-retry"), is(0));
-        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, "echo-echo-consumer-error"), is(0));
-        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, "echo-echo-consumer-invalid"), is(1));
-        verify(service).processMessage(new ServiceParameters("value"));
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, "stream-company-officers"),
+                is(1));
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
+                "stream-company-officers-company-appointments-consumer-retry"), is(0));
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
+                "stream-company-officers-company-appointments-consumer-error"), is(0));
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
+                "stream-company-officers-company-appointments-consumer-invalid"), is(1));
+        verify(service).processMessage(any());
     }
 }

@@ -14,4 +14,5 @@ import org.springframework.test.context.ActiveProfiles;
 @EmbeddedKafka
 @Import(TestConfig.class)
 public class Configuration {
+
 }
