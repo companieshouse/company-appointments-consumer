@@ -57,7 +57,7 @@ class InvalidMessageRouterTest {
                         new RecordHeader(EXCEPTION_MESSAGE, "invalid".getBytes())));
 
         ResourceChangedData invalidData = new ResourceChangedData("", "", "", "",
-                "{ \"invalid_message\": \"exception: [ invalid ] passed for topic: officers-main, partition: 0, offset: 1\" }",
+                "{ \"invalid_message\": \"exception: [ invalid ] redirecting message from topic: officers-main, partition: 0, offset: 1 to invalid topic\" }",
                 new EventRecord("", "", Collections.emptyList()));
         // when
         ProducerRecord<String, ResourceChangedData> actual = invalidMessageRouter.onSend(message);
@@ -78,7 +78,7 @@ class InvalidMessageRouterTest {
                         new RecordHeader(EXCEPTION_MESSAGE, "invalid".getBytes())));
 
         ResourceChangedData invalidData = new ResourceChangedData("", "", "", "",
-                "{ \"invalid_message\": \"exception: [ invalid ] passed for topic: profile-main, partition: 0, offset: 1\" }",
+                "{ \"invalid_message\": \"exception: [ invalid ] redirecting message from topic: profile-main, partition: 0, offset: 1 to invalid topic\" }",
                 new EventRecord("", "", Collections.emptyList()));
         // when
         ProducerRecord<String, ResourceChangedData> actual = invalidMessageRouter.onSend(message);
@@ -95,7 +95,7 @@ class InvalidMessageRouterTest {
                 changedData);
 
         ResourceChangedData invalidData = new ResourceChangedData("", "", "", "",
-                "{ \"invalid_message\": \"exception: [ unknown ] passed for topic: unknown, partition: -1, offset: -1\" }",
+                "{ \"invalid_message\": \"exception: [ unknown ] redirecting message from topic: unknown, partition: -1, offset: -1 to invalid topic\" }",
                 new EventRecord("", "", Collections.emptyList()));
 
         // when

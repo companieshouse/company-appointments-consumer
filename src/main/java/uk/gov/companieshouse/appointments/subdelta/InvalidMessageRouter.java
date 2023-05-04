@@ -3,7 +3,6 @@ package uk.gov.companieshouse.appointments.subdelta;
 import static org.springframework.kafka.support.KafkaHeaders.EXCEPTION_MESSAGE;
 import static org.springframework.kafka.support.KafkaHeaders.ORIGINAL_OFFSET;
 import static org.springframework.kafka.support.KafkaHeaders.ORIGINAL_PARTITION;
-import static org.springframework.kafka.support.KafkaHeaders.ORIGINAL_TOPIC;
 import static uk.gov.companieshouse.appointments.subdelta.Application.NAMESPACE;
 
 import java.math.BigInteger;
@@ -52,7 +51,7 @@ public class InvalidMessageRouter implements ProducerInterceptor<String, Resourc
 
             ResourceChangedData invalidData = new ResourceChangedData("", "", "", "",
                     String.format(
-                            "{ \"invalid_message\": \"exception: [ %s ] passed for topic: %s, partition: %d, offset: %d\" }",
+                            "{ \"invalid_message\": \"exception: [ %s ] redirecting message from topic: %s, partition: %d, offset: %d to invalid topic\" }",
                             exception, originalTopic, partition, offset),
                     new EventRecord("", "", Collections.emptyList()));
 

@@ -3,9 +3,14 @@ package uk.gov.companieshouse.appointments.subdelta;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,7 +18,10 @@ import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.companieshouse.api.company.Data;
 import uk.gov.companieshouse.stream.ResourceChangedData;
+
+import java.io.IOException;
 
 @ExtendWith(MockitoExtension.class)
 class CompanyProfileChangedServiceTest {
@@ -26,13 +34,15 @@ class CompanyProfileChangedServiceTest {
     private static final String COMPANY_STATUS = "active";
 
     @Mock
+    private ObjectMapper objectMapper;
+    @Mock
     private AppointmentsClient appointmentsClient;
     @InjectMocks
     private CompanyProfileChangedService service;
 
     @Test
     @DisplayName("Should process changed company profile successfully with no exceptions")
-    void processChangedCompanyProfile() {
+    void processChangedCompanyProfile() throws IOException {
         // given
         ResourceChangedData changedData = new ResourceChangedData();
         changedData.setResourceUri(CHANGED_COMPANY_PROFILE_RESOURCE_URI);
@@ -40,22 +50,29 @@ class CompanyProfileChangedServiceTest {
         String companyProfileData = "{ \"company_name\": \"COMPANY LIMITED\", \"company_status\": \"active\" }";
         changedData.setData(companyProfileData);
 
+        Data data = new Data()
+                .companyName("COMPANY LIMITED")
+                .companyStatus("active");
+        when(objectMapper.readValue(anyString(), eq(Data.class))).thenReturn(data);
+
         // when
         service.processMessage(changedData);
 
         // then
+        verify(objectMapper).readValue(companyProfileData, Data.class);
         verify(appointmentsClient).patchCompanyNameAndStatus(CHANGED_COMPANY_PROFILE_PATCH_URI, COMPANY_NAME, COMPANY_STATUS, CONTEXT_ID);
     }
 
     @Test
     @DisplayName("Should throw NonRetryableException when JsonProcessingException is caught")
-    void processChangedCompanyProfileThrowsNonRetryableException() {
+    void processChangedCompanyProfileThrowsNonRetryableException() throws JsonProcessingException {
         // given
         ResourceChangedData changedData = new ResourceChangedData();
         changedData.setResourceUri(CHANGED_COMPANY_PROFILE_RESOURCE_URI);
         changedData.setContextId(CONTEXT_ID);
         String companyProfileData = "{ \"invalid_field\": \"COMPANY LIMITED\", \"company_status\": \"active\" }";
         changedData.setData(companyProfileData);
+        when(objectMapper.readValue(anyString(), eq(Data.class))).thenThrow(JsonProcessingException.class);
 
         // when
         Executable executable = () -> service.processMessage(changedData);
@@ -65,4 +82,5 @@ class CompanyProfileChangedServiceTest {
         assertEquals(DESERIALISE_FAILED_MESSAGE, exception.getMessage());
         verifyNoInteractions(appointmentsClient);
     }
+
 }

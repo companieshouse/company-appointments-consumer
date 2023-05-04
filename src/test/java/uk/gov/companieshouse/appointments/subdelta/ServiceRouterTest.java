@@ -24,9 +24,9 @@ class ServiceRouterTest {
     private static final String INVALID_TOPIC = "invalid topic";
 
     @Mock
-    private Service companyAppointmentChangedService;
+    private CompanyAppointmentChangedService companyAppointmentChangedService;
     @Mock
-    private Service companyProfileChangedService;
+    private CompanyProfileChangedService companyProfileChangedService;
 
     private ServiceRouter router;
 

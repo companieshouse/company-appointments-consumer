@@ -15,12 +15,12 @@ public class ServiceRouter {
     private static final String NOT_PROCESSED_MESSAGE = "Message was not processed as event type was not 'changed'";
     private static final String EVENT_TYPE_CHANGED = "changed";
 
-    private final Service companyAppointmentService;
-    private final Service companyProfileService;
+    private final CompanyAppointmentChangedService companyAppointmentService;
+    private final CompanyProfileChangedService companyProfileService;
     private final String companyOfficersTopic;
     private final String companyProfileTopic;
 
-    public ServiceRouter(Service companyAppointmentService, Service companyProfileService,
+    public ServiceRouter(CompanyAppointmentChangedService companyAppointmentService, CompanyProfileChangedService companyProfileService,
             @Value("${consumer.officers.topic}") String companyOfficersTopic,
             @Value("${consumer.profile.topic}") String companyProfileTopic) {
         this.companyOfficersTopic = companyOfficersTopic;

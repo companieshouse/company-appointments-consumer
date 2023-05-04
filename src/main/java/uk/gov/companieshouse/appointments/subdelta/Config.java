@@ -1,7 +1,8 @@
 package uk.gov.companieshouse.appointments.subdelta;
 
-import java.util.Map;
-import java.util.function.Supplier;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -24,9 +25,19 @@ import uk.gov.companieshouse.api.InternalApiClient;
 import uk.gov.companieshouse.api.http.ApiKeyHttpClient;
 import uk.gov.companieshouse.stream.ResourceChangedData;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 @Configuration
 @EnableKafka
 public class Config {
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper()
+                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                .registerModule(new JavaTimeModule());
+    }
 
     @Bean
     public ConsumerFactory<String, ResourceChangedData> consumerFactory(

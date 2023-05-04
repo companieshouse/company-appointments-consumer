@@ -4,11 +4,13 @@ import static uk.gov.companieshouse.appointments.subdelta.Application.NAMESPACE;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.api.company.Data;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.logging.LoggerFactory;
 import uk.gov.companieshouse.stream.ResourceChangedData;
 
+@Component
 public class CompanyProfileChangedService implements Service {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NAMESPACE);
@@ -16,16 +18,18 @@ public class CompanyProfileChangedService implements Service {
     private static final String EXISTING_APPOINTMENTS_URI_SUFFIX = "/appointments";
 
     private final AppointmentsClient appointmentsClient;
+    private final ObjectMapper objectMapper;
 
-    public CompanyProfileChangedService(AppointmentsClient appointmentsClient) {
+    public CompanyProfileChangedService(AppointmentsClient appointmentsClient, ObjectMapper objectMapper) {
         this.appointmentsClient = appointmentsClient;
+        this.objectMapper = objectMapper;
     }
 
     @Override
     public void processMessage(ResourceChangedData changedData) {
         Data companyProfileData;
         try {
-            companyProfileData = new ObjectMapper().readValue(changedData.getData(), Data.class);
+            companyProfileData = objectMapper.readValue(changedData.getData(), Data.class);
         } catch (JsonProcessingException ex) {
             LOGGER.debug(String.format(DESERIALISE_FAILED_MESSAGE, changedData.getResourceUri()));
             throw new NonRetryableException(String.format(DESERIALISE_FAILED_MESSAGE, changedData.getResourceUri()), ex);
