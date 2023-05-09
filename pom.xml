@@ -295,6 +295,28 @@
         <version>${jacoco-maven-plugin.version}</version>
         <executions>
           <execution>
+            <id>pre-unit-test</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+            <configuration>
+              <!-- Sets the path to the file which contains the execution model. -->
+              <destFile>${sonar.jacoco.reports}/jacoco.exec</destFile>
+              <propertyName>surefireArgLine</propertyName>
+            </configuration>
+          </execution>
+          <execution>
+            <id>post-unit-test</id>
+            <phase>test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+            <configuration>
+              <dataFile>${sonar.jacoco.reports}/jacoco.exec</dataFile>
+              <outputDirectory>${sonar.jacoco.reports}/jacoco</outputDirectory>
+            </configuration>
+          </execution>
+          <execution>
             <id>pre-integration-test</id>
             <phase>pre-integration-test</phase>
             <goals>
