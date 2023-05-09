@@ -2,18 +2,21 @@ package uk.gov.companieshouse.appointments.subdelta;
 
 import uk.gov.companieshouse.stream.ResourceChangedData;
 
-/**
- * Contains all parameters required by {@link Service service implementations}.
- */
-public class ServiceParameters {
+public class RouterParameters {
 
     private final ResourceChangedData resourceChangedData;
+    private final String topic;
 
-    public ServiceParameters(ResourceChangedData resourceChangedData) {
+    public RouterParameters(ResourceChangedData resourceChangedData, String topic) {
         this.resourceChangedData = resourceChangedData;
+        this.topic = topic;
     }
 
     public ResourceChangedData getResourceChangedData() {
         return resourceChangedData;
+    }
+
+    public String getTopic() {
+        return topic;
     }
 }

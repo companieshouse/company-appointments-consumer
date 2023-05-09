@@ -1,5 +1,7 @@
 package uk.gov.companieshouse.appointments.subdelta;
 
+import static uk.gov.companieshouse.appointments.subdelta.Application.NAMESPACE;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -30,8 +32,7 @@ import uk.gov.companieshouse.logging.LoggerFactory;
 @Aspect
 public class MessageLoggingAspect {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Application.NAMESPACE);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(NAMESPACE);
     private static final String LOG_MESSAGE_RECEIVED = "Processing resource changed data message";
     private static final String LOG_MESSAGE_PROCESSED = "Processed resource changed data message";
     private static final String EXCEPTION_MESSAGE = "%s exception thrown: %s";

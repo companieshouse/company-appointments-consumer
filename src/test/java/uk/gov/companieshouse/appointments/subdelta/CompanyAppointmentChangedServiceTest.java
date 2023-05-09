@@ -1,6 +1,5 @@
 package uk.gov.companieshouse.appointments.subdelta;
 
-import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -17,36 +16,33 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.companieshouse.api.company.Data;
-import uk.gov.companieshouse.stream.EventRecord;
 import uk.gov.companieshouse.stream.ResourceChangedData;
 
 @ExtendWith(MockitoExtension.class)
-class AppointmentsChangeServiceTest {
+class CompanyAppointmentChangedServiceTest {
 
-    private static final String RESOURCE_URI = "resource URI";
+    private static final String CHANGED_APPOINTMENT_RESOURCE_URI = "/company/12345678/appointments/abc123";
     private static final String CONTEXT_ID = "context id";
-    private static final String COMPANY_NAME = "company name";
-    private static final String COMPANY_STATUS = "company status";
+    private static final String COMPANY_NAME = "COMPANY LIMITED";
+    private static final String COMPANY_STATUS = "active";
     private static final String COMPANY_NUMBER = "company number";
 
+    @Mock
+    private CompanyNumberExtractor companyNumberExtractor;
     @Mock
     private CompanyProfileClient companyProfileClient;
     @Mock
     private AppointmentsClient appointmentsClient;
-    @Mock
-    private CompanyNumberExtractor companyNumberExtractor;
     @InjectMocks
-    private AppointmentsChangeService service;
+    private CompanyAppointmentChangedService service;
 
     @Test
-    @DisplayName("Should process message successfully with no exceptions")
-    void processMessage() {
+    @DisplayName("Should process changed company appointment successfully with no exceptions")
+    void processChangedCompanyAppointment() {
         // given
         ResourceChangedData changedData = new ResourceChangedData();
-        changedData.setResourceUri(RESOURCE_URI);
+        changedData.setResourceUri(CHANGED_APPOINTMENT_RESOURCE_URI);
         changedData.setContextId(CONTEXT_ID);
-        changedData.setEvent(new EventRecord("", "changed", emptyList()));
-        ServiceParameters serviceParameters = new ServiceParameters(changedData);
 
         Data companyProfile = new Data()
                 .companyName(COMPANY_NAME)
@@ -56,95 +52,74 @@ class AppointmentsChangeServiceTest {
         when(companyProfileClient.fetchCompanyProfile(any(), any())).thenReturn(Optional.of(companyProfile));
 
         // when
-        service.processMessage(serviceParameters);
+        service.processMessage(changedData);
 
         // then
-        verify(companyNumberExtractor).extractFromUri(RESOURCE_URI);
+        verify(companyNumberExtractor).extractFromUri(CHANGED_APPOINTMENT_RESOURCE_URI);
         verify(companyProfileClient).fetchCompanyProfile(COMPANY_NUMBER, CONTEXT_ID);
-        verify(appointmentsClient).patchCompanyNameAndStatus(RESOURCE_URI, COMPANY_NAME, COMPANY_STATUS, CONTEXT_ID);
+        verify(appointmentsClient).patchCompanyNameAndStatus(CHANGED_APPOINTMENT_RESOURCE_URI, COMPANY_NAME, COMPANY_STATUS, CONTEXT_ID);
     }
 
-    @Test
-    @DisplayName("Should not process a message when event type is deleted")
-    void processMessageDeleted() {
-        // given
-        ResourceChangedData changedData = new ResourceChangedData();
-        changedData.setEvent(new EventRecord("", "deleted", emptyList()));
-        ServiceParameters serviceParameters = new ServiceParameters(changedData);
 
-        // when
-        service.processMessage(serviceParameters);
-
-        // then
-        verifyNoInteractions(companyNumberExtractor);
-        verifyNoInteractions(companyProfileClient);
-        verifyNoInteractions(appointmentsClient);
-    }
 
     @Test
     @DisplayName("Should not call api clients when company number extractor throws non retryable exception")
-    void processMessageBadURI() {
+    void processChangedCompanyAppointmentBadURI() {
         // given
         ResourceChangedData changedData = new ResourceChangedData();
-        changedData.setResourceUri(RESOURCE_URI);
-        changedData.setEvent(new EventRecord("", "changed", emptyList()));
-        ServiceParameters serviceParameters = new ServiceParameters(changedData);
+        changedData.setResourceUri(CHANGED_APPOINTMENT_RESOURCE_URI);
 
         when(companyNumberExtractor.extractFromUri(any())).thenThrow(NonRetryableException.class);
 
         // when
-        Executable executable = () -> service.processMessage(serviceParameters);
+        Executable executable = () -> service.processMessage(changedData);
 
         // then
         assertThrows(NonRetryableException.class, executable);
-        verify(companyNumberExtractor).extractFromUri(RESOURCE_URI);
+        verify(companyNumberExtractor).extractFromUri(CHANGED_APPOINTMENT_RESOURCE_URI);
         verifyNoInteractions(companyProfileClient);
         verifyNoInteractions(appointmentsClient);
     }
 
     @Test
     @DisplayName("Should throw non retryable exception when company profile is empty")
-    void processMessageEmptyCompanyProfile() {
+    void processChangedCompanyAppointmentEmptyCompanyProfile() {
         // given
         ResourceChangedData changedData = new ResourceChangedData();
-        changedData.setResourceUri(RESOURCE_URI);
+        changedData.setResourceUri(CHANGED_APPOINTMENT_RESOURCE_URI);
         changedData.setContextId(CONTEXT_ID);
-        changedData.setEvent(new EventRecord("", "changed", emptyList()));
-        ServiceParameters serviceParameters = new ServiceParameters(changedData);
 
         when(companyNumberExtractor.extractFromUri(any())).thenReturn(COMPANY_NUMBER);
         when(companyProfileClient.fetchCompanyProfile(any(), any())).thenReturn(Optional.empty());
 
         // when
-        Executable executable = () -> service.processMessage(serviceParameters);
+        Executable executable = () -> service.processMessage(changedData);
 
         // then
         NonRetryableException exception = assertThrows(NonRetryableException.class, executable);
         assertEquals(String.format("Company profile not found for %s", COMPANY_NUMBER), exception.getMessage());
-        verify(companyNumberExtractor).extractFromUri(RESOURCE_URI);
+        verify(companyNumberExtractor).extractFromUri(CHANGED_APPOINTMENT_RESOURCE_URI);
         verify(companyProfileClient).fetchCompanyProfile(COMPANY_NUMBER, CONTEXT_ID);
         verifyNoInteractions(appointmentsClient);
     }
 
     @Test
     @DisplayName("Should not call appointments client when company profile client throws non retryable exception")
-    void processMessageCompanyProfileError() {
+    void processChangedCompanyAppointmentCompanyProfileError() {
         // given
         ResourceChangedData changedData = new ResourceChangedData();
-        changedData.setResourceUri(RESOURCE_URI);
+        changedData.setResourceUri(CHANGED_APPOINTMENT_RESOURCE_URI);
         changedData.setContextId(CONTEXT_ID);
-        changedData.setEvent(new EventRecord("", "changed", emptyList()));
-        ServiceParameters serviceParameters = new ServiceParameters(changedData);
 
         when(companyNumberExtractor.extractFromUri(any())).thenReturn(COMPANY_NUMBER);
         when(companyProfileClient.fetchCompanyProfile(any(), any())).thenThrow(NonRetryableException.class);
 
         // when
-        Executable executable = () -> service.processMessage(serviceParameters);
+        Executable executable = () -> service.processMessage(changedData);
 
         // then
         assertThrows(NonRetryableException.class, executable);
-        verify(companyNumberExtractor).extractFromUri(RESOURCE_URI);
+        verify(companyNumberExtractor).extractFromUri(CHANGED_APPOINTMENT_RESOURCE_URI);
         verify(companyProfileClient).fetchCompanyProfile(COMPANY_NUMBER, CONTEXT_ID);
         verifyNoInteractions(appointmentsClient);
     }

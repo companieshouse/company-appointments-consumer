@@ -80,7 +80,7 @@ class AppointmentsClientTest {
                         .companyName(COMPANY_NAME)
                         .companyStatus(COMPANY_STATUS));
         verify(responseHandler).handle(String.format(
-                "HTTP response code 503 when updating appointment for resource URI %s with context id %s", RESOURCE_URI, CONTEXT_ID),
+                "HTTP response code 503 when updating appointment(s) for resource URI %s with context id %s", RESOURCE_URI, CONTEXT_ID),
                 apiErrorResponseException);
     }
 
@@ -103,7 +103,7 @@ class AppointmentsClientTest {
                         .companyName(COMPANY_NAME)
                         .companyStatus(COMPANY_STATUS));
         verify(responseHandler).handle(String.format(
-                "Failed updating appointment for resource URI %s with context id %s", RESOURCE_URI, CONTEXT_ID),
+                "Failed updating appointment(s) for resource URI %s with context id %s", RESOURCE_URI, CONTEXT_ID),
                 illegalArgumentException);
     }
 
@@ -126,7 +126,7 @@ class AppointmentsClientTest {
                         .companyName(COMPANY_NAME)
                         .companyStatus(COMPANY_STATUS));
         verify(responseHandler).handle(String.format(
-                "Failed updating appointment for resource URI %s with context id %s", RESOURCE_URI, CONTEXT_ID),
+                "Failed updating appointment(s) for resource URI %s with context id %s", RESOURCE_URI, CONTEXT_ID),
                 uriValidationException);
     }
 }

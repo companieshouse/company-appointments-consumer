@@ -41,40 +41,61 @@ class InvalidMessageRouterTest {
     void setup() {
         invalidMessageRouter = new InvalidMessageRouter();
         invalidMessageRouter.configure(
-                Map.of("message.flags", flags, "invalid.message.topic", "invalid"));
+                Map.of("message.flags", flags,
+                        "invalid.message.topic.officers", "officers-invalid",
+                        "invalid.message.topic.profile", "profile-invalid"));
     }
 
     @Test
-    void testOnSendRoutesMessageToInvalidMessageTopicIfInvalidPayloadExceptionThrown() {
+    void testOnSendRoutesMessageToOfficersInvalidMessageTopicIfInvalidPayloadExceptionThrown() {
         // given
-        ProducerRecord<String, ResourceChangedData> message = new ProducerRecord<>("main", 0, "key",
+        ProducerRecord<String, ResourceChangedData> message = new ProducerRecord<>("officers-main", 0, "key",
                 changedData,
                 List.of(
-                        new RecordHeader(ORIGINAL_TOPIC, "main".getBytes()),
                         new RecordHeader(ORIGINAL_PARTITION, BigInteger.ZERO.toByteArray()),
                         new RecordHeader(ORIGINAL_OFFSET, BigInteger.ONE.toByteArray()),
                         new RecordHeader(EXCEPTION_MESSAGE, "invalid".getBytes())));
 
         ResourceChangedData invalidData = new ResourceChangedData("", "", "", "",
-                "{ \"invalid_message\": \"exception: [ invalid ] passed for topic: main, partition: 0, offset: 1\" }",
+                "{ \"invalid_message\": \"exception: [ invalid ] redirecting message from topic: officers-main, partition: 0, offset: 1 to invalid topic\" }",
                 new EventRecord("", "", Collections.emptyList()));
         // when
         ProducerRecord<String, ResourceChangedData> actual = invalidMessageRouter.onSend(message);
 
         // then
         verify(flags, times(0)).destroy();
-        assertThat(actual, is(equalTo(new ProducerRecord<>("invalid", "key", invalidData))));
+        assertThat(actual, is(equalTo(new ProducerRecord<>("officers-invalid", "key", invalidData))));
     }
 
     @Test
-    void testOnSendRoutesMessageToInvalidMessageTopicIfInvalidPayloadExceptionThrownNoHeaders() {
+    void testOnSendRoutesMessageToProfileInvalidMessageTopicIfInvalidPayloadExceptionThrown() {
         // given
-        ProducerRecord<String, ResourceChangedData> message = new ProducerRecord<>("main", "key",
-                changedData);
-
+        ProducerRecord<String, ResourceChangedData> message = new ProducerRecord<>("profile-main", 0, "key",
+                changedData,
+                List.of(
+                        new RecordHeader(ORIGINAL_PARTITION, BigInteger.ZERO.toByteArray()),
+                        new RecordHeader(ORIGINAL_OFFSET, BigInteger.ONE.toByteArray()),
+                        new RecordHeader(EXCEPTION_MESSAGE, "invalid".getBytes())));
 
         ResourceChangedData invalidData = new ResourceChangedData("", "", "", "",
-                "{ \"invalid_message\": \"exception: [ unknown ] passed for topic: unknown, partition: -1, offset: -1\" }",
+                "{ \"invalid_message\": \"exception: [ invalid ] redirecting message from topic: profile-main, partition: 0, offset: 1 to invalid topic\" }",
+                new EventRecord("", "", Collections.emptyList()));
+        // when
+        ProducerRecord<String, ResourceChangedData> actual = invalidMessageRouter.onSend(message);
+
+        // then
+        verify(flags, times(0)).destroy();
+        assertThat(actual, is(equalTo(new ProducerRecord<>("profile-invalid", "key", invalidData))));
+    }
+
+    @Test
+    void testOnSendRoutesMessageToOfficersInvalidMessageTopicIfInvalidPayloadExceptionThrownUnknownOriginTopic() {
+        // given
+        ProducerRecord<String, ResourceChangedData> message = new ProducerRecord<>("unknown", "key",
+                changedData);
+
+        ResourceChangedData invalidData = new ResourceChangedData("", "", "", "",
+                "{ \"invalid_message\": \"exception: [ unknown ] redirecting message from topic: unknown, partition: -1, offset: -1 to invalid topic\" }",
                 new EventRecord("", "", Collections.emptyList()));
 
         // when
@@ -82,7 +103,7 @@ class InvalidMessageRouterTest {
 
         // then
         verify(flags, times(0)).destroy();
-        assertThat(actual, is(equalTo(new ProducerRecord<>("invalid", "key", invalidData))));
+        assertThat(actual, is(equalTo(new ProducerRecord<>("officers-invalid", "key", invalidData))));
     }
 
     @Test

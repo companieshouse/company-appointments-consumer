@@ -1,5 +1,7 @@
 package uk.gov.companieshouse.appointments.subdelta;
 
+import static uk.gov.companieshouse.appointments.subdelta.Application.NAMESPACE;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.api.error.ApiErrorResponseException;
@@ -10,7 +12,7 @@ import uk.gov.companieshouse.logging.LoggerFactory;
 @Component
 public class ResponseHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Application.NAMESPACE);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NAMESPACE);
 
     public void handle(String message, URIValidationException ex) {
         LOGGER.error(message);

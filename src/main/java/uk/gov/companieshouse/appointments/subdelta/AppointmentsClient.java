@@ -10,8 +10,8 @@ import uk.gov.companieshouse.api.handler.exception.URIValidationException;
 @Component
 public class AppointmentsClient {
 
-    private static final String FAILED_MSG = "Failed updating appointment for resource URI %s with context id %s";
-    private static final String ERROR_MSG = "HTTP response code %s when updating appointment for resource URI %s with context id %s";
+    private static final String FAILED_MSG = "Failed updating appointment(s) for resource URI %s with context id %s";
+    private static final String ERROR_MSG = "HTTP response code %s when updating appointment(s) for resource URI %s with context id %s";
 
     private final Supplier<InternalApiClient> internalApiClientFactory;
     private final ResponseHandler responseHandler;
