@@ -21,9 +21,8 @@ public class ServiceRouter {
     }
 
     public void route(ResourceChangedData changedData) {
-
         if (EVENT_TYPE_CHANGED.equals(changedData.getEvent().getType())) {
-                companyProfileService.processMessage(changedData);
+            companyProfileService.processMessage(changedData);
         } else {
             LOGGER.debug(NOT_PROCESSED_MESSAGE);
         }
