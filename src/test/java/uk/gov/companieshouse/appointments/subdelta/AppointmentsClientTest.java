@@ -43,14 +43,14 @@ class AppointmentsClientTest {
 
     @Test
     @DisplayName("Should execute http request successfully with no exceptions")
-    void patchCompanyNameAndStatus() {
+    void patchCompanyNameAndStatusForAllAppointments() {
         // given
         when(clientSupplier.get()).thenReturn(apiClient);
         when(apiClient.privateDeltaResourceHandler()).thenReturn(resourceHandler);
         when(resourceHandler.patchCompanyAppointment(any(), any())).thenReturn(appointmentPatch);
 
         // when
-        client.patchCompanyNameAndStatus(RESOURCE_URI, COMPANY_NAME, COMPANY_STATUS, CONTEXT_ID);
+        client.patchCompanyNameAndStatusForAllAppointments(RESOURCE_URI, COMPANY_NAME, COMPANY_STATUS, CONTEXT_ID);
 
         // then
         verify(resourceHandler).patchCompanyAppointment(RESOURCE_URI,
@@ -61,7 +61,7 @@ class AppointmentsClientTest {
 
     @Test
     @DisplayName("Should delegate to response handler when ApiErrorResponseException caught")
-    void patchCompanyNameAndStatusApiErrorResponseException() throws ApiErrorResponseException, URIValidationException {
+    void patchCompanyNameAndStatusForAllAppointmentsApiErrorResponseException() throws ApiErrorResponseException, URIValidationException {
         // given
         HttpResponseException.Builder builder = new HttpResponseException.Builder(503, "service unavailable", new HttpHeaders());
         ApiErrorResponseException apiErrorResponseException = new ApiErrorResponseException(builder);
@@ -72,7 +72,7 @@ class AppointmentsClientTest {
         when(appointmentPatch.execute()).thenThrow(apiErrorResponseException);
 
         // when
-        client.patchCompanyNameAndStatus(RESOURCE_URI, COMPANY_NAME, COMPANY_STATUS, CONTEXT_ID);
+        client.patchCompanyNameAndStatusForAllAppointments(RESOURCE_URI, COMPANY_NAME, COMPANY_STATUS, CONTEXT_ID);
 
         // then
         verify(resourceHandler).patchCompanyAppointment(RESOURCE_URI,
@@ -86,7 +86,7 @@ class AppointmentsClientTest {
 
     @Test
     @DisplayName("Should delegate to response handler when IllegalArgumentException caught")
-    void patchCompanyNameAndStatusIllegalArgumentException() throws ApiErrorResponseException, URIValidationException {
+    void patchCompanyNameAndStatusForAllAppointmentsIllegalArgumentException() throws ApiErrorResponseException, URIValidationException {
         // given
         IllegalArgumentException illegalArgumentException = new IllegalArgumentException();
         when(clientSupplier.get()).thenReturn(apiClient);
@@ -95,7 +95,7 @@ class AppointmentsClientTest {
         when(appointmentPatch.execute()).thenThrow(illegalArgumentException);
 
         // when
-        client.patchCompanyNameAndStatus(RESOURCE_URI, COMPANY_NAME, COMPANY_STATUS, CONTEXT_ID);
+        client.patchCompanyNameAndStatusForAllAppointments(RESOURCE_URI, COMPANY_NAME, COMPANY_STATUS, CONTEXT_ID);
 
         // then
         verify(resourceHandler).patchCompanyAppointment(RESOURCE_URI,
@@ -109,7 +109,7 @@ class AppointmentsClientTest {
 
     @Test
     @DisplayName("Should delegate to response handler when URIValidationException caught")
-    void patchCompanyNameAndStatusURIValidationException() throws ApiErrorResponseException, URIValidationException {
+    void patchCompanyNameAndStatusForAllAppointmentsURIValidationException() throws ApiErrorResponseException, URIValidationException {
         // given
         URIValidationException uriValidationException = new URIValidationException("Invalid URI");
         when(clientSupplier.get()).thenReturn(apiClient);
@@ -118,7 +118,7 @@ class AppointmentsClientTest {
         when(appointmentPatch.execute()).thenThrow(uriValidationException);
 
         // when
-        client.patchCompanyNameAndStatus(RESOURCE_URI, COMPANY_NAME, COMPANY_STATUS, CONTEXT_ID);
+        client.patchCompanyNameAndStatusForAllAppointments(RESOURCE_URI, COMPANY_NAME, COMPANY_STATUS, CONTEXT_ID);
 
         // then
         verify(resourceHandler).patchCompanyAppointment(RESOURCE_URI,

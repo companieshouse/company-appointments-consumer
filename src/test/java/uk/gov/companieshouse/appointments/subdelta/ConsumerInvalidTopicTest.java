@@ -2,10 +2,6 @@ package uk.gov.companieshouse.appointments.subdelta;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static uk.gov.companieshouse.appointments.subdelta.TestUtils.STREAM_COMPANY_OFFICERS_ERROR_TOPIC;
-import static uk.gov.companieshouse.appointments.subdelta.TestUtils.STREAM_COMPANY_OFFICERS_INVALID_TOPIC;
-import static uk.gov.companieshouse.appointments.subdelta.TestUtils.STREAM_COMPANY_OFFICERS_RETRY_TOPIC;
-import static uk.gov.companieshouse.appointments.subdelta.TestUtils.STREAM_COMPANY_OFFICERS_TOPIC;
 import static uk.gov.companieshouse.appointments.subdelta.TestUtils.STREAM_COMPANY_PROFILE_ERROR_TOPIC;
 import static uk.gov.companieshouse.appointments.subdelta.TestUtils.STREAM_COMPANY_PROFILE_INVALID_TOPIC;
 import static uk.gov.companieshouse.appointments.subdelta.TestUtils.STREAM_COMPANY_PROFILE_RETRY_TOPIC;
@@ -35,11 +31,7 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest(classes = Application.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @EmbeddedKafka(
-        topics = {STREAM_COMPANY_OFFICERS_TOPIC,
-                STREAM_COMPANY_OFFICERS_RETRY_TOPIC,
-                STREAM_COMPANY_OFFICERS_ERROR_TOPIC,
-                STREAM_COMPANY_OFFICERS_INVALID_TOPIC,
-                STREAM_COMPANY_PROFILE_TOPIC,
+        topics = {STREAM_COMPANY_PROFILE_TOPIC,
                 STREAM_COMPANY_PROFILE_RETRY_TOPIC,
                 STREAM_COMPANY_PROFILE_ERROR_TOPIC,
                 STREAM_COMPANY_PROFILE_INVALID_TOPIC},
@@ -58,34 +50,6 @@ class ConsumerInvalidTopicTest {
 
     @Autowired
     private KafkaProducer<String, byte[]> testProducer;
-
-    @Test
-    void testPublishToCompanyOfficersInvalidMessageTopicIfInvalidDataDeserialised() throws Exception {
-        //given
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        Encoder encoder = EncoderFactory.get().directBinaryEncoder(outputStream, null);
-        DatumWriter<String> writer = new ReflectDatumWriter<>(String.class);
-        writer.write("bad data", encoder);
-
-        embeddedKafkaBroker.consumeFromAllEmbeddedTopics(testConsumer);
-
-        //when
-        Future<RecordMetadata> future = testProducer.send(
-                new ProducerRecord<>(STREAM_COMPANY_OFFICERS_TOPIC,
-                        0, System.currentTimeMillis(), "key", outputStream.toByteArray()));
-        future.get();
-        ConsumerRecords<?, ?> consumerRecords = KafkaTestUtils.getRecords(testConsumer, 10000L, 2);
-
-        //then
-        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, STREAM_COMPANY_OFFICERS_TOPIC),
-                is(1));
-        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
-                STREAM_COMPANY_OFFICERS_RETRY_TOPIC), is(0));
-        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
-                STREAM_COMPANY_OFFICERS_ERROR_TOPIC), is(0));
-        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
-                STREAM_COMPANY_OFFICERS_INVALID_TOPIC), is(1));
-    }
 
     @Test
     void testPublishToCompanyProfileInvalidMessageTopicIfInvalidDataDeserialised() throws Exception {
