@@ -36,7 +36,7 @@ public class CompanyProfileChangedService implements Service {
         }
 
         String uri = changedData.getResourceUri() + EXISTING_APPOINTMENTS_URI_SUFFIX;
-        appointmentsClient.patchCompanyNameAndStatus(uri, companyProfileData.getCompanyName(),
+        appointmentsClient.patchCompanyNameAndStatusForAllAppointments(uri, companyProfileData.getCompanyName(),
                 companyProfileData.getCompanyStatus(), changedData.getContextId());
     }
 }

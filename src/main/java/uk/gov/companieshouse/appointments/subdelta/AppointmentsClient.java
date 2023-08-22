@@ -22,7 +22,7 @@ public class AppointmentsClient {
         this.responseHandler = responseHandler;
     }
 
-    public void patchCompanyNameAndStatus(String resourceUri, String companyName, String status,
+    public void patchCompanyNameAndStatusForAllAppointments(String resourceUri, String companyName, String status,
             String contextId) {
         InternalApiClient client = internalApiClientFactory.get();
 

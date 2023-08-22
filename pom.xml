@@ -11,11 +11,9 @@
 
   <name>company-appointments-consumer</name>
   <description>
-    This service will consume from the stream-company-profile and stream-company-officers Kafka
-    topics.
+    This service will consume from the stream-company-profile Kafka topic.
     Working with the Company Appointments API service, it will be able to PATCH company name and
-    statuses to
-    appointments.
+    statuses to appointments.
   </description>
 
   <artifactId>company-appointments-consumer</artifactId>

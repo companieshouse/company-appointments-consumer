@@ -62,7 +62,6 @@ public class Config {
     public ProducerFactory<String, ResourceChangedData> producerFactory(
             @Value("${spring.kafka.bootstrap-servers}") String bootstrapServers,
             MessageFlags messageFlags,
-            @Value("${invalid_message_topic.officers}") String officersInvalidTopic,
             @Value("${invalid_message_topic.profile}") String profileInvalidTopic) {
         return new DefaultKafkaProducerFactory<>(
                 Map.of(
@@ -74,7 +73,6 @@ public class Config {
                         ProducerConfig.INTERCEPTOR_CLASSES_CONFIG,
                         InvalidMessageRouter.class.getName(),
                         "message.flags", messageFlags,
-                        "invalid.message.topic.officers", officersInvalidTopic,
                         "invalid.message.topic.profile", profileInvalidTopic),
                 new StringSerializer(), new ResourceChangedDataSerialiser());
     }

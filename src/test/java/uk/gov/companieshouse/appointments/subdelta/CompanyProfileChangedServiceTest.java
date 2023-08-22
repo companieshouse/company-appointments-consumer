@@ -60,7 +60,7 @@ class CompanyProfileChangedServiceTest {
 
         // then
         verify(objectMapper).readValue(companyProfileData, Data.class);
-        verify(appointmentsClient).patchCompanyNameAndStatus(CHANGED_COMPANY_PROFILE_PATCH_URI, COMPANY_NAME, COMPANY_STATUS, CONTEXT_ID);
+        verify(appointmentsClient).patchCompanyNameAndStatusForAllAppointments(CHANGED_COMPANY_PROFILE_PATCH_URI, COMPANY_NAME, COMPANY_STATUS, CONTEXT_ID);
     }
 
     @Test

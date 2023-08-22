@@ -26,7 +26,6 @@ public class InvalidMessageRouter implements ProducerInterceptor<String, Resourc
     private static final Logger LOGGER = LoggerFactory.getLogger(NAMESPACE);
 
     private MessageFlags messageFlags;
-    private String officersInvalidTopic;
     private String profileInvalidTopic;
 
     @Override
@@ -55,22 +54,10 @@ public class InvalidMessageRouter implements ProducerInterceptor<String, Resourc
                             exception, originalTopic, partition, offset),
                     new EventRecord("", "", Collections.emptyList()));
 
-            String invalidTopic;
-            if (originalTopic.contains("profile")) {
-                invalidTopic = profileInvalidTopic;
-            } else if (originalTopic.contains("officers")) {
-                invalidTopic = officersInvalidTopic;
-            } else {
-                LOGGER.info("Could not determine original topic. Publishing to officers invalid topic by default.");
-                invalidTopic = officersInvalidTopic;
-            }
-
-            ProducerRecord<String, ResourceChangedData> invalidRecord = new ProducerRecord<>(
-                    invalidTopic, producerRecord.key(), invalidData);
             LOGGER.info(String.format("Moving record into topic: [%s]%nMessage content: %s",
-                    invalidRecord.topic(), invalidData.getData()));
+                    profileInvalidTopic, invalidData.getData()));
 
-            return invalidRecord;
+            return new ProducerRecord<>(profileInvalidTopic, producerRecord.key(), invalidData);
         }
     }
 
@@ -87,7 +74,6 @@ public class InvalidMessageRouter implements ProducerInterceptor<String, Resourc
     @Override
     public void configure(Map<String, ?> configs) {
         this.messageFlags = (MessageFlags) configs.get("message.flags");
-        this.officersInvalidTopic = (String) configs.get("invalid.message.topic.officers");
         this.profileInvalidTopic = (String) configs.get("invalid.message.topic.profile");
     }
 }
