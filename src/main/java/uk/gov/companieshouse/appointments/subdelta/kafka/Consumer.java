@@ -1,4 +1,4 @@
-package uk.gov.companieshouse.appointments.subdelta;
+package uk.gov.companieshouse.appointments.subdelta.kafka;
 
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.RetryableTopic;
@@ -7,6 +7,8 @@ import org.springframework.kafka.retrytopic.FixedDelayStrategy;
 import org.springframework.messaging.Message;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Component;
+import uk.gov.companieshouse.appointments.subdelta.companyprofile.ServiceRouter;
+import uk.gov.companieshouse.appointments.subdelta.exception.RetryableException;
 import uk.gov.companieshouse.stream.ResourceChangedData;
 
 /**

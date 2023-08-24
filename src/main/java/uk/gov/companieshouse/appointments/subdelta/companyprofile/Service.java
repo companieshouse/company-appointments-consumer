@@ -1,4 +1,4 @@
-package uk.gov.companieshouse.appointments.subdelta;
+package uk.gov.companieshouse.appointments.subdelta.companyprofile;
 
 import uk.gov.companieshouse.stream.ResourceChangedData;
 

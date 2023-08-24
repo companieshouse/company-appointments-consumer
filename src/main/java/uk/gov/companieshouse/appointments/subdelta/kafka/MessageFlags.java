@@ -1,4 +1,4 @@
-package uk.gov.companieshouse.appointments.subdelta;
+package uk.gov.companieshouse.appointments.subdelta.kafka;
 
 import javax.annotation.PreDestroy;
 import org.springframework.stereotype.Component;

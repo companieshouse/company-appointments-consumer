@@ -1,4 +1,4 @@
-package uk.gov.companieshouse.appointments.subdelta;
+package uk.gov.companieshouse.appointments.subdelta.exception;
 
 /**
  * A recoverable exception has occurred e.g. due to a service that is temporarily unavailable.

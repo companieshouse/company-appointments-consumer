@@ -1,16 +1,15 @@
-package uk.gov.companieshouse.appointments.subdelta;
+package uk.gov.companieshouse.appointments.subdelta.kafka;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static uk.gov.companieshouse.appointments.subdelta.TestUtils.STREAM_COMPANY_PROFILE_ERROR_TOPIC;
-import static uk.gov.companieshouse.appointments.subdelta.TestUtils.STREAM_COMPANY_PROFILE_INVALID_TOPIC;
-import static uk.gov.companieshouse.appointments.subdelta.TestUtils.STREAM_COMPANY_PROFILE_RETRY_TOPIC;
-import static uk.gov.companieshouse.appointments.subdelta.TestUtils.STREAM_COMPANY_PROFILE_TOPIC;
+import static uk.gov.companieshouse.appointments.subdelta.kafka.TestUtils.STREAM_COMPANY_PROFILE_ERROR_TOPIC;
+import static uk.gov.companieshouse.appointments.subdelta.kafka.TestUtils.STREAM_COMPANY_PROFILE_INVALID_TOPIC;
+import static uk.gov.companieshouse.appointments.subdelta.kafka.TestUtils.STREAM_COMPANY_PROFILE_RETRY_TOPIC;
+import static uk.gov.companieshouse.appointments.subdelta.kafka.TestUtils.STREAM_COMPANY_PROFILE_TOPIC;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Collections;
@@ -24,6 +23,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,6 +34,9 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import uk.gov.companieshouse.appointments.subdelta.Application;
+import uk.gov.companieshouse.appointments.subdelta.companyprofile.ServiceRouter;
+import uk.gov.companieshouse.appointments.subdelta.exception.NonRetryableException;
 import uk.gov.companieshouse.stream.EventRecord;
 import uk.gov.companieshouse.stream.ResourceChangedData;
 
@@ -48,8 +51,8 @@ import uk.gov.companieshouse.stream.ResourceChangedData;
         partitions = 1
 )
 @Import(TestConfig.class)
-@ActiveProfiles("test_main_retryable")
-class ConsumerRetryableExceptionTest {
+@ActiveProfiles("test_main_nonretryable")
+class ConsumerNonRetryableExceptionTest {
 
     @Autowired
     private EmbeddedKafkaBroker embeddedKafkaBroker;
@@ -67,7 +70,7 @@ class ConsumerRetryableExceptionTest {
     private ServiceRouter router;
 
     @Test
-    void testRepublishToCompanyProfileErrorTopicThroughRetryTopics() throws Exception {
+    void testRepublishToCompanyProfileInvalidMessageTopicIfNonRetryableExceptionThrown() throws Exception {
         //given
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Encoder encoder = EncoderFactory.get().directBinaryEncoder(outputStream, null);
@@ -76,7 +79,7 @@ class ConsumerRetryableExceptionTest {
                 new EventRecord("", "", Collections.emptyList())), encoder);
 
         embeddedKafkaBroker.consumeFromAllEmbeddedTopics(testConsumer);
-        doThrow(RetryableException.class).when(router).route(any());
+        doThrow(NonRetryableException.class).when(router).route(any());
 
         //when
         testProducer.send(
@@ -85,17 +88,17 @@ class ConsumerRetryableExceptionTest {
         if (!latch.await(5L, TimeUnit.SECONDS)) {
             fail("Timed out waiting for latch");
         }
+        ConsumerRecords<?, ?> consumerRecords = KafkaTestUtils.getRecords(testConsumer, 10000L, 2);
 
         //then
-        ConsumerRecords<?, ?> consumerRecords = KafkaTestUtils.getRecords(testConsumer, 10000L, 6);
-        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, STREAM_COMPANY_PROFILE_TOPIC),
+        MatcherAssert.assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, STREAM_COMPANY_PROFILE_TOPIC),
                 is(1));
         assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
-                STREAM_COMPANY_PROFILE_RETRY_TOPIC), is(4));
+                STREAM_COMPANY_PROFILE_RETRY_TOPIC), is(0));
         assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
-                STREAM_COMPANY_PROFILE_ERROR_TOPIC), is(1));
+                STREAM_COMPANY_PROFILE_ERROR_TOPIC), is(0));
         assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
-                STREAM_COMPANY_PROFILE_INVALID_TOPIC), is(0));
-        verify(router, times(5)).route(any());
+                STREAM_COMPANY_PROFILE_INVALID_TOPIC), is(1));
+        verify(router).route(any());
     }
 }

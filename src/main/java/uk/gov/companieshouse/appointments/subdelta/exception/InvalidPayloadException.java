@@ -1,4 +1,4 @@
-package uk.gov.companieshouse.appointments.subdelta;
+package uk.gov.companieshouse.appointments.subdelta.exception;
 
 /**
  * Exception to handle when an invalid payload is sent to the kafka topic.

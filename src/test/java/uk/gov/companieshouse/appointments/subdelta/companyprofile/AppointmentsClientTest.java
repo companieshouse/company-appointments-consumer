@@ -1,4 +1,4 @@
-package uk.gov.companieshouse.appointments.subdelta;
+package uk.gov.companieshouse.appointments.subdelta.companyprofile;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -19,6 +19,8 @@ import uk.gov.companieshouse.api.error.ApiErrorResponseException;
 import uk.gov.companieshouse.api.handler.delta.PrivateDeltaResourceHandler;
 import uk.gov.companieshouse.api.handler.delta.company.appointment.request.PrivateCompanyAppointmentPatch;
 import uk.gov.companieshouse.api.handler.exception.URIValidationException;
+import uk.gov.companieshouse.appointments.subdelta.companyprofile.AppointmentsClient;
+import uk.gov.companieshouse.appointments.subdelta.companyprofile.ResponseHandler;
 
 @ExtendWith(MockitoExtension.class)
 class AppointmentsClientTest {

@@ -1,4 +1,4 @@
-package uk.gov.companieshouse.appointments.subdelta;
+package uk.gov.companieshouse.appointments.subdelta.companyprofile;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,6 +19,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.companieshouse.api.company.Data;
+import uk.gov.companieshouse.appointments.subdelta.companyprofile.AppointmentsClient;
+import uk.gov.companieshouse.appointments.subdelta.companyprofile.CompanyProfileChangedService;
+import uk.gov.companieshouse.appointments.subdelta.exception.NonRetryableException;
 import uk.gov.companieshouse.stream.ResourceChangedData;
 
 import java.io.IOException;

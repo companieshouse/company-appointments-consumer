@@ -1,4 +1,4 @@
-package uk.gov.companieshouse.appointments.subdelta;
+package uk.gov.companieshouse.appointments.subdelta.kafka;
 
 import java.util.Map;
 import java.util.UUID;

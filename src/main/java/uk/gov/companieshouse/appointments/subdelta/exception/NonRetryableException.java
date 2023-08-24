@@ -1,4 +1,4 @@
-package uk.gov.companieshouse.appointments.subdelta;
+package uk.gov.companieshouse.appointments.subdelta.exception;
 
 /**
  * An unrecoverable error has occurred, e.g. due to the service being misconfigured or due to

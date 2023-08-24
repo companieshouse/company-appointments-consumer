@@ -1,4 +1,4 @@
-package uk.gov.companieshouse.appointments.subdelta;
+package uk.gov.companieshouse.appointments.subdelta.kafka;
 
 import java.util.concurrent.CountDownLatch;
 import org.aspectj.lang.JoinPoint;
