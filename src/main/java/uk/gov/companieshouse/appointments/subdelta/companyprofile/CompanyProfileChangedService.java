@@ -12,7 +12,7 @@ import uk.gov.companieshouse.logging.LoggerFactory;
 import uk.gov.companieshouse.stream.ResourceChangedData;
 
 @Component
-public class CompanyProfileChangedService implements Service {
+class CompanyProfileChangedService implements Service {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NAMESPACE);
     private static final String DESERIALISE_FAILED_MESSAGE = "Failed to deserialise company profile data: [%s]";
