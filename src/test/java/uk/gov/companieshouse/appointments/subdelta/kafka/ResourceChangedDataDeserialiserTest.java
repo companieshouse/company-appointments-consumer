@@ -20,7 +20,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import uk.gov.companieshouse.appointments.subdelta.exception.InvalidPayloadException;
-import uk.gov.companieshouse.appointments.subdelta.kafka.ResourceChangedDataDeserialiser;
 import uk.gov.companieshouse.stream.EventRecord;
 import uk.gov.companieshouse.stream.ResourceChangedData;
 

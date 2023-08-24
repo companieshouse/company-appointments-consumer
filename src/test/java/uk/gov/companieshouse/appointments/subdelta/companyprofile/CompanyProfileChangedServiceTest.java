@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,19 +20,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.companieshouse.api.company.Data;
-import uk.gov.companieshouse.appointments.subdelta.companyprofile.AppointmentsClient;
-import uk.gov.companieshouse.appointments.subdelta.companyprofile.CompanyProfileChangedService;
 import uk.gov.companieshouse.appointments.subdelta.exception.NonRetryableException;
 import uk.gov.companieshouse.stream.ResourceChangedData;
-
-import java.io.IOException;
 
 @ExtendWith(MockitoExtension.class)
 class CompanyProfileChangedServiceTest {
 
     private static final String CHANGED_COMPANY_PROFILE_PATCH_URI = "/company/12345678/appointments";
     private static final String CHANGED_COMPANY_PROFILE_RESOURCE_URI = "/company/12345678";
-    private static final String DESERIALISE_FAILED_MESSAGE = String.format("Failed to deserialise company profile data: [%s]", CHANGED_COMPANY_PROFILE_RESOURCE_URI);
+    private static final String DESERIALISE_FAILED_MESSAGE = "Failed to deserialise company profile data";
     private static final String CONTEXT_ID = "context id";
     private static final String COMPANY_NAME = "COMPANY LIMITED";
     private static final String COMPANY_STATUS = "active";
@@ -63,7 +60,7 @@ class CompanyProfileChangedServiceTest {
 
         // then
         verify(objectMapper).readValue(companyProfileData, Data.class);
-        verify(appointmentsClient).patchCompanyNameAndStatusForAllAppointments(CHANGED_COMPANY_PROFILE_PATCH_URI, COMPANY_NAME, COMPANY_STATUS, CONTEXT_ID);
+        verify(appointmentsClient).patchCompanyNameAndStatusForAllAppointments(CHANGED_COMPANY_PROFILE_PATCH_URI, COMPANY_NAME, COMPANY_STATUS);
     }
 
     @Test

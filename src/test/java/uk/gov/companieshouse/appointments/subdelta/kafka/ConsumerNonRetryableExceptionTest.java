@@ -23,7 +23,6 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -75,7 +74,7 @@ class ConsumerNonRetryableExceptionTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Encoder encoder = EncoderFactory.get().directBinaryEncoder(outputStream, null);
         DatumWriter<ResourceChangedData> writer = new ReflectDatumWriter<>(ResourceChangedData.class);
-        writer.write(new ResourceChangedData("", "", "", "", "{}",
+        writer.write(new ResourceChangedData("", "", "context_id", "12345678", "{}",
                 new EventRecord("", "", Collections.emptyList())), encoder);
 
         embeddedKafkaBroker.consumeFromAllEmbeddedTopics(testConsumer);
@@ -91,7 +90,7 @@ class ConsumerNonRetryableExceptionTest {
         ConsumerRecords<?, ?> consumerRecords = KafkaTestUtils.getRecords(testConsumer, 10000L, 2);
 
         //then
-        MatcherAssert.assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, STREAM_COMPANY_PROFILE_TOPIC),
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, STREAM_COMPANY_PROFILE_TOPIC),
                 is(1));
         assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
                 STREAM_COMPANY_PROFILE_RETRY_TOPIC), is(0));

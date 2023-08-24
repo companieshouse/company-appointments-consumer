@@ -11,7 +11,6 @@ import org.junit.jupiter.api.function.Executable;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.companieshouse.api.error.ApiErrorResponseException;
 import uk.gov.companieshouse.api.handler.exception.URIValidationException;
-import uk.gov.companieshouse.appointments.subdelta.companyprofile.ResponseHandler;
 import uk.gov.companieshouse.appointments.subdelta.exception.NonRetryableException;
 import uk.gov.companieshouse.appointments.subdelta.exception.RetryableException;
 

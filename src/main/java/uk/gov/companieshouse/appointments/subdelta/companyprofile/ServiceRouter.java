@@ -3,6 +3,7 @@ package uk.gov.companieshouse.appointments.subdelta.companyprofile;
 import static uk.gov.companieshouse.appointments.subdelta.Application.NAMESPACE;
 
 import org.springframework.stereotype.Component;
+import uk.gov.companieshouse.appointments.subdelta.logging.DataMapHolder;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.logging.LoggerFactory;
 import uk.gov.companieshouse.stream.ResourceChangedData;
@@ -24,7 +25,7 @@ public class ServiceRouter {
         if (EVENT_TYPE_CHANGED.equals(changedData.getEvent().getType())) {
             companyProfileService.processMessage(changedData);
         } else {
-            LOGGER.debug(NOT_PROCESSED_MESSAGE);
+            LOGGER.debug(NOT_PROCESSED_MESSAGE, DataMapHolder.getLogMap());
         }
     }
 }

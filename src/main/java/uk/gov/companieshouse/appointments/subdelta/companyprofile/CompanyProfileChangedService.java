@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.api.company.Data;
 import uk.gov.companieshouse.appointments.subdelta.exception.NonRetryableException;
+import uk.gov.companieshouse.appointments.subdelta.logging.DataMapHolder;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.logging.LoggerFactory;
 import uk.gov.companieshouse.stream.ResourceChangedData;
@@ -15,7 +16,7 @@ import uk.gov.companieshouse.stream.ResourceChangedData;
 class CompanyProfileChangedService implements Service {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NAMESPACE);
-    private static final String DESERIALISE_FAILED_MESSAGE = "Failed to deserialise company profile data: [%s]";
+    private static final String DESERIALISE_FAILED_MESSAGE = "Failed to deserialise company profile data";
     private static final String EXISTING_APPOINTMENTS_URI_SUFFIX = "/appointments";
 
     private final AppointmentsClient appointmentsClient;
@@ -32,12 +33,12 @@ class CompanyProfileChangedService implements Service {
         try {
             companyProfileData = objectMapper.readValue(changedData.getData(), Data.class);
         } catch (JsonProcessingException ex) {
-            LOGGER.debug(String.format(DESERIALISE_FAILED_MESSAGE, changedData.getResourceUri()));
-            throw new NonRetryableException(String.format(DESERIALISE_FAILED_MESSAGE, changedData.getResourceUri()), ex);
+            LOGGER.debug(DESERIALISE_FAILED_MESSAGE, DataMapHolder.getLogMap());
+            throw new NonRetryableException(DESERIALISE_FAILED_MESSAGE, ex);
         }
 
         String uri = changedData.getResourceUri() + EXISTING_APPOINTMENTS_URI_SUFFIX;
         appointmentsClient.patchCompanyNameAndStatusForAllAppointments(uri, companyProfileData.getCompanyName(),
-                companyProfileData.getCompanyStatus(), changedData.getContextId());
+                companyProfileData.getCompanyStatus());
     }
 }

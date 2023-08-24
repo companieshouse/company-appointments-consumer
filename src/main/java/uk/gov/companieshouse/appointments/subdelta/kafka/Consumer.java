@@ -9,6 +9,7 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.appointments.subdelta.companyprofile.ServiceRouter;
 import uk.gov.companieshouse.appointments.subdelta.exception.RetryableException;
+import uk.gov.companieshouse.appointments.subdelta.logging.DataMapHolder;
 import uk.gov.companieshouse.stream.ResourceChangedData;
 
 /**
@@ -48,6 +49,7 @@ public class Consumer {
     )
     public void consume(Message<ResourceChangedData> message) {
         try {
+            DataMapHolder.get().companyNumber(message.getPayload().getResourceId());
             router.route(message.getPayload());
         } catch (RetryableException exception) {
             messageFlags.setRetryable(true);

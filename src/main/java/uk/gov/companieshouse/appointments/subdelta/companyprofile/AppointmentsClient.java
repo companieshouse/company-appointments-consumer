@@ -6,12 +6,13 @@ import uk.gov.companieshouse.api.InternalApiClient;
 import uk.gov.companieshouse.api.appointment.PatchAppointmentNameStatusApi;
 import uk.gov.companieshouse.api.error.ApiErrorResponseException;
 import uk.gov.companieshouse.api.handler.exception.URIValidationException;
+import uk.gov.companieshouse.appointments.subdelta.logging.DataMapHolder;
 
 @Component
 class AppointmentsClient {
 
-    private static final String FAILED_MSG = "Failed updating appointment(s) for resource URI %s with context id %s";
-    private static final String ERROR_MSG = "HTTP response code %s when updating appointment(s) for resource URI %s with context id %s";
+    private static final String FAILED_MSG = "Failed updating appointment(s) for resource URI %s";
+    private static final String ERROR_MSG = "HTTP response code %s when updating appointment(s) for resource URI %s";
 
     private final Supplier<InternalApiClient> internalApiClientFactory;
     private final ResponseHandler responseHandler;
@@ -22,10 +23,9 @@ class AppointmentsClient {
         this.responseHandler = responseHandler;
     }
 
-    public void patchCompanyNameAndStatusForAllAppointments(String resourceUri, String companyName, String status,
-            String contextId) {
+    public void patchCompanyNameAndStatusForAllAppointments(String resourceUri, String companyName, String status) {
         InternalApiClient client = internalApiClientFactory.get();
-
+        client.getHttpClient().setRequestId(DataMapHolder.getRequestId());
         try {
             client.privateDeltaResourceHandler()
                     .patchCompanyAppointment(resourceUri, new PatchAppointmentNameStatusApi()
@@ -34,11 +34,11 @@ class AppointmentsClient {
                     .execute();
         } catch (ApiErrorResponseException ex) {
             responseHandler.handle(
-                    String.format(ERROR_MSG, ex.getStatusCode(), resourceUri, contextId), ex);
+                    String.format(ERROR_MSG, ex.getStatusCode(), resourceUri), ex);
         } catch (IllegalArgumentException ex) {
-            responseHandler.handle(String.format(FAILED_MSG, resourceUri, contextId), ex);
+            responseHandler.handle(String.format(FAILED_MSG, resourceUri), ex);
         } catch (URIValidationException ex) {
-            responseHandler.handle(String.format(FAILED_MSG, resourceUri, contextId), ex);
+            responseHandler.handle(String.format(FAILED_MSG, resourceUri), ex);
         }
     }
 }
