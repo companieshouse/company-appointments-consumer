@@ -1,10 +1,6 @@
 package uk.gov.companieshouse.appointments.subdelta.kafka;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -41,7 +37,7 @@ class ResourceChangedDataSerialiserTest {
         byte[] actual = serialiser.serialize("topic", changedData);
 
         // then
-        assertThat(actual, is(notNullValue()));
+        assertThat(actual).isNotNull();
     }
 
     @Test
@@ -59,7 +55,7 @@ class ResourceChangedDataSerialiserTest {
 
         // then
         NonRetryableException exception = assertThrows(NonRetryableException.class, actual);
-        assertThat(exception.getMessage(), is(equalTo("Error serialising delta")));
-        assertThat(exception.getCause(), is(instanceOf(IOException.class)));
+        assertThat(exception.getMessage()).isEqualTo("Error serialising delta");
+        assertThat(exception.getCause()).isInstanceOf(IOException.class);
     }
 }

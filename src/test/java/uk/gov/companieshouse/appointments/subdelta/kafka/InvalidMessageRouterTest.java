@@ -1,9 +1,6 @@
 package uk.gov.companieshouse.appointments.subdelta.kafka;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -62,7 +59,7 @@ class InvalidMessageRouterTest {
 
         // then
         verify(flags, times(0)).destroy();
-        assertThat(actual, is(equalTo(new ProducerRecord<>("profile-invalid", "key", invalidData))));
+        assertThat(actual).isEqualTo(new ProducerRecord<>("profile-invalid", "key", invalidData));
     }
 
     @Test
@@ -77,6 +74,6 @@ class InvalidMessageRouterTest {
 
         // then
         verify(flags, times(1)).destroy();
-        assertThat(actual, is(sameInstance(message)));
+        assertThat(actual).isSameAs((message));
     }
 }

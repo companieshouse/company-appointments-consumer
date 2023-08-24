@@ -1,7 +1,6 @@
 package uk.gov.companieshouse.appointments.subdelta.kafka;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -50,6 +49,7 @@ import uk.gov.companieshouse.stream.ResourceChangedData;
 @Import(TestConfig.class)
 @ActiveProfiles("test_main_positive")
 class ConsumerPositiveTest {
+
     @Autowired
     private EmbeddedKafkaBroker embeddedKafkaBroker;
 
@@ -86,14 +86,10 @@ class ConsumerPositiveTest {
 
         //then
         ConsumerRecords<?, ?> consumerRecords = KafkaTestUtils.getRecords(testConsumer, 10000L, 1);
-        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, STREAM_COMPANY_PROFILE_TOPIC),
-                is(1));
-        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
-                STREAM_COMPANY_PROFILE_RETRY_TOPIC), is(0));
-        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
-                STREAM_COMPANY_PROFILE_ERROR_TOPIC), is(0));
-        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
-                STREAM_COMPANY_PROFILE_INVALID_TOPIC), is(0));
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, STREAM_COMPANY_PROFILE_TOPIC)).isEqualTo(1);
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, STREAM_COMPANY_PROFILE_RETRY_TOPIC)).isZero();
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, STREAM_COMPANY_PROFILE_ERROR_TOPIC)).isZero();
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, STREAM_COMPANY_PROFILE_INVALID_TOPIC)).isZero();
         verify(router).route(any());
     }
 }

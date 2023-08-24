@@ -1,7 +1,6 @@
 package uk.gov.companieshouse.appointments.subdelta.kafka;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -91,14 +90,12 @@ class ConsumerRetryableExceptionTest {
 
         //then
         ConsumerRecords<?, ?> consumerRecords = KafkaTestUtils.getRecords(testConsumer, 10000L, 6);
-        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, STREAM_COMPANY_PROFILE_TOPIC),
-                is(1));
-        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
-                STREAM_COMPANY_PROFILE_RETRY_TOPIC), is(4));
-        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
-                STREAM_COMPANY_PROFILE_ERROR_TOPIC), is(1));
-        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords,
-                STREAM_COMPANY_PROFILE_INVALID_TOPIC), is(0));
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, STREAM_COMPANY_PROFILE_TOPIC)).isEqualTo(1);
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, STREAM_COMPANY_PROFILE_RETRY_TOPIC))
+                .isEqualTo(4);
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, STREAM_COMPANY_PROFILE_ERROR_TOPIC))
+                .isEqualTo(1);
+        assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, STREAM_COMPANY_PROFILE_INVALID_TOPIC)).isZero();
         verify(router, times(5)).route(any());
     }
 }

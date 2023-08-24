@@ -1,8 +1,6 @@
 package uk.gov.companieshouse.appointments.subdelta.kafka;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.ByteArrayOutputStream;
@@ -15,7 +13,6 @@ import org.apache.avro.io.Encoder;
 import org.apache.avro.io.EncoderFactory;
 import org.apache.avro.reflect.ReflectDatumWriter;
 import org.apache.avro.specific.SpecificDatumWriter;
-import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -45,7 +42,7 @@ class ResourceChangedDataDeserialiserTest {
                     outputStream.toByteArray());
 
             // then
-            assertThat(actual, is(equalTo(changeData)));
+            assertThat(actual).isEqualTo(changeData);
         }
     }
 
@@ -66,8 +63,8 @@ class ResourceChangedDataDeserialiserTest {
         // then
         InvalidPayloadException exception = assertThrows(InvalidPayloadException.class, actual);
         // Note the '\n' is the length prefix of the invalid data sent to the deserialiser
-        assertThat(exception.getMessage(), is(equalTo("Invalid payload: [\nhello] was provided.")));
-        assertThat(exception.getCause(), is(CoreMatchers.instanceOf(IOException.class)));
+        assertThat(exception.getMessage()).isEqualTo("Invalid payload: [\nhello] was provided.");
+        assertThat(exception.getCause()).isInstanceOf(IOException.class);
     }
 
     @Test
@@ -82,8 +79,7 @@ class ResourceChangedDataDeserialiserTest {
 
         // then
         InvalidPayloadException exception = assertThrows(InvalidPayloadException.class, actual);
-        assertThat(exception.getMessage(), is(equalTo("Invalid payload: [invalid] was provided.")));
-        assertThat(exception.getCause(), is(CoreMatchers.instanceOf(AvroRuntimeException.class)));
+        assertThat(exception.getMessage()).isEqualTo("Invalid payload: [invalid] was provided.");
+        assertThat(exception.getCause()).isInstanceOf(AvroRuntimeException.class);
     }
-
 }
