@@ -9,7 +9,7 @@ import uk.gov.companieshouse.api.handler.exception.URIValidationException;
 import uk.gov.companieshouse.appointments.subdelta.logging.DataMapHolder;
 
 @Component
-class AppointmentsClient {
+public class AppointmentsClient {
 
     private static final String FAILED_MSG = "Failed updating appointment(s) for resource URI %s";
     private static final String ERROR_MSG = "HTTP response code %s when updating appointment(s) for resource URI %s";

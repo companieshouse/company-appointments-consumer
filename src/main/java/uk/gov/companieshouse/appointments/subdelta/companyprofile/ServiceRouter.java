@@ -15,15 +15,15 @@ public class ServiceRouter {
     private static final String NOT_PROCESSED_MESSAGE = "Message was not processed as event type was not 'changed'";
     private static final String EVENT_TYPE_CHANGED = "changed";
 
-    private final CompanyProfileChangedService companyProfileService;
+    private final Service companyProfileChangedService;
 
-    public ServiceRouter(CompanyProfileChangedService companyProfileService) {
-        this.companyProfileService = companyProfileService;
+    public ServiceRouter(Service companyProfileService) {
+        this.companyProfileChangedService = companyProfileService;
     }
 
     public void route(ResourceChangedData changedData) {
         if (EVENT_TYPE_CHANGED.equals(changedData.getEvent().getType())) {
-            companyProfileService.processMessage(changedData);
+            companyProfileChangedService.processMessage(changedData);
         } else {
             LOGGER.debug(NOT_PROCESSED_MESSAGE, DataMapHolder.getLogMap());
         }

@@ -2,7 +2,7 @@ package uk.gov.companieshouse.appointments.subdelta.companyprofile;
 
 import uk.gov.companieshouse.stream.ResourceChangedData;
 
-interface Service {
+public interface Service {
 
     void processMessage(ResourceChangedData changedData);
 }
