@@ -1,17 +1,23 @@
 package uk.gov.companieshouse.appointments.subdelta.companyprofile;
 
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,6 +25,7 @@ import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ClassPathResource;
 import uk.gov.companieshouse.api.company.Data;
 import uk.gov.companieshouse.appointments.subdelta.exception.NonRetryableException;
 import uk.gov.companieshouse.stream.ResourceChangedData;
@@ -47,12 +54,14 @@ class CompanyProfileChangedServiceTest {
         ResourceChangedData changedData = new ResourceChangedData();
         changedData.setResourceUri(CHANGED_COMPANY_PROFILE_RESOURCE_URI);
         changedData.setContextId(CONTEXT_ID);
-        String companyProfileData = "{ \"company_name\": \"COMPANY LIMITED\", \"company_status\": \"active\" }";
+
+        InputStream resource = new ClassPathResource("/example_stream_company_profile_message.json").getInputStream();
+        String companyProfileData = new String(resource.readAllBytes());
         changedData.setData(companyProfileData);
 
         Data data = new Data()
-                .companyName("COMPANY LIMITED")
-                .companyStatus("active");
+                .companyName(COMPANY_NAME)
+                .companyStatus(COMPANY_STATUS);
         when(objectMapper.readValue(anyString(), eq(Data.class))).thenReturn(data);
 
         // when
@@ -82,5 +91,4 @@ class CompanyProfileChangedServiceTest {
         assertEquals(DESERIALISE_FAILED_MESSAGE, exception.getMessage());
         verifyNoInteractions(appointmentsClient);
     }
-
 }
