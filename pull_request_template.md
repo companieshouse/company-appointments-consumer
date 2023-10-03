@@ -19,7 +19,7 @@
 
 ### Release preparation
 - [ ] Have these changes been included in a release ticket?
-- [ ] Are changes required to the `docker-chs-development`?
-- [ ] Are changes to CH Config?
+- [ ] Are changes required to the `docker-chs-development` deployment or test data?
+- [ ] Are any changes required to the environment added to `chs-configs?
 
 ## Notes to the tester
