@@ -1,5 +1,6 @@
 package uk.gov.companieshouse.appointments.subdelta.companyprofile;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -56,7 +57,7 @@ class ResponseHandlerTest {
     @Test
     void handleApiErrorResponseExceptionNonRetryable() {
         // given
-        HttpResponseException.Builder builder = new HttpResponseException.Builder(404, "not found", new HttpHeaders());
+        HttpResponseException.Builder builder = new HttpResponseException.Builder(401, "unauthorized", new HttpHeaders());
         ApiErrorResponseException apiErrorResponseException = new ApiErrorResponseException(builder);
 
         // when
@@ -65,5 +66,18 @@ class ResponseHandlerTest {
         // then
         NonRetryableException exception = assertThrows(NonRetryableException.class, executable);
         assertEquals("failed message", exception.getMessage());
+    }
+
+    @Test
+    void handleApiErrorResponseExceptionWhenNotFound() {
+        // given
+        HttpResponseException.Builder builder = new HttpResponseException.Builder(404, "not found", new HttpHeaders());
+        ApiErrorResponseException apiErrorResponseException = new ApiErrorResponseException(builder);
+
+        // when
+        Executable executable = () -> responseHandler.handle("failed message", apiErrorResponseException);
+
+        // then
+        assertDoesNotThrow(executable);
     }
 }
