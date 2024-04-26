@@ -1,0 +1,67 @@
+{
+  "accounts": {
+    "accounting_reference_date": {
+      "day": "31",
+      "month": "12"
+    },
+    "last_accounts": {
+      "made_up_to": "2014-12-31",
+      "period_end_on": "2014-12-31",
+      "period_start_on": "2014-01-01",
+      "type": "medium"
+    },
+    "next_accounts": {
+      "due_on": "2016-06-30",
+      "overdue": true,
+      "period_end_on": "2015-12-31",
+      "period_start_on": "2015-01-01"
+    },
+    "next_due": "2016-06-30",
+    "next_made_up_to": "2015-12-31",
+    "overdue": true
+  },
+  "company_name": "COMPANY NAME",
+  "company_number": "12345678",
+  "company_status": "active",
+  "confirmation_statement": {
+    "last_made_up_to": "2016-06-06"
+  },
+  "date_of_cessation": "2019-01-01",
+  "date_of_creation": "1940-01-22",
+  "etag": "etag",
+  "external_registration_number": "12345",
+  "is_community_interest_company": true,
+  "jurisdiction": "england-wales",
+  "last_full_members_list_date": "2014-05-23",
+  "links": {
+    "filing_history": "/company/12345678/filing-history",
+    "officers": "/company/12345678/officers",
+    "self": "/company/12345678"
+  },
+  "registered_office_address": {
+    "address_line_1": "1 address Road",
+    "address_line_2": "line2",
+    "care_of": "careOf",
+    "country": "Wales",
+    "locality": "Cardiff",
+    "po_box": "12345",
+    "postal_code": "CF01 3AB",
+    "region": "region"
+  },
+  "service_address": {
+    "address_line_1": "1 other Road",
+    "address_line_2": "secondLine",
+    "care_of": "name",
+    "country": "Wales",
+    "locality": "Swansea",
+    "po_box": "21212",
+    "postal_code": "CF15 3UB",
+    "region": "region"
+  },
+  "sic_codes": [
+    "70100"
+  ],
+  "subtype": "private-fund-limited-partnership",
+  "super_secure_managing_officer_count": 0,
+  "type": "private-unlimited"
+}
