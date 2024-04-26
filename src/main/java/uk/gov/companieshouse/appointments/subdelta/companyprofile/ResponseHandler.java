@@ -33,6 +33,9 @@ public class ResponseHandler {
         if (HttpStatus.valueOf(ex.getStatusCode()).is5xxServerError()) {
             LOGGER.info(message, DataMapHolder.getLogMap());
             throw new RetryableException(message, ex);
+        } else if (HttpStatus.valueOf(ex.getStatusCode()) == HttpStatus.NOT_FOUND) {
+            LOGGER.info("HTTP response code 404 returned, appointments not yet inserted for company in context.",
+                    DataMapHolder.getLogMap());
         } else {
             LOGGER.error(message, DataMapHolder.getLogMap());
             throw new NonRetryableException(message, ex);
