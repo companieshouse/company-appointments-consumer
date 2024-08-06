@@ -1,5 +1,8 @@
 package uk.gov.companieshouse.appointments.subdelta.kafka;
 
+import static uk.gov.companieshouse.appointments.subdelta.kafka.TestUtils.*;
+
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
@@ -19,14 +22,9 @@ import org.springframework.context.annotation.Bean;
 public class TestConfig {
 
     @Bean
-    CountDownLatch latch(@Value("${steps}") int steps) {
-        return new CountDownLatch(steps);
-    }
-
-    @Bean
     KafkaConsumer<String, byte[]> testConsumer(
             @Value("${spring.kafka.bootstrap-servers}") String bootstrapServers) {
-        return new KafkaConsumer<>(
+        KafkaConsumer<String, byte[]> consumer = new KafkaConsumer<>(
                 Map.of(
                         ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
                         ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
@@ -35,6 +33,14 @@ public class TestConfig {
                         ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false",
                         ConsumerConfig.GROUP_ID_CONFIG, UUID.randomUUID().toString()),
                 new StringDeserializer(), new ByteArrayDeserializer());
+
+        consumer.subscribe(List.of(
+                STREAM_COMPANY_PROFILE_TOPIC,
+                STREAM_COMPANY_PROFILE_RETRY_TOPIC,
+                STREAM_COMPANY_PROFILE_ERROR_TOPIC,
+                STREAM_COMPANY_PROFILE_INVALID_TOPIC));
+
+        return consumer;
     }
 
     @Bean
