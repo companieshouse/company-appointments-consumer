@@ -11,7 +11,6 @@ import static uk.gov.companieshouse.appointments.subdelta.kafka.TestUtils.STREAM
 
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import java.io.ByteArrayOutputStream;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;

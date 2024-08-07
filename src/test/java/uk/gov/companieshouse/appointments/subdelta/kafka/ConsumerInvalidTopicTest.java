@@ -27,7 +27,6 @@ import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import uk.gov.companieshouse.appointments.subdelta.Application;
 
 @SpringBootTest
 @WireMockTest(httpPort = 8888)
