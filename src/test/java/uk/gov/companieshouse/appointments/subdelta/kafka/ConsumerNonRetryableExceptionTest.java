@@ -39,7 +39,7 @@ import uk.gov.companieshouse.appointments.subdelta.exception.NonRetryableExcepti
 import uk.gov.companieshouse.stream.EventRecord;
 import uk.gov.companieshouse.stream.ResourceChangedData;
 
-@SpringBootTest(classes = Application.class)
+@SpringBootTest
 @WireMockTest(httpPort = 8888)
 @ActiveProfiles("test_main_nonretryable")
 class ConsumerNonRetryableExceptionTest extends AbstractKafkaTest {

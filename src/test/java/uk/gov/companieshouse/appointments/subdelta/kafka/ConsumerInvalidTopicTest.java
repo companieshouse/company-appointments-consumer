@@ -29,7 +29,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import uk.gov.companieshouse.appointments.subdelta.Application;
 
-@SpringBootTest(classes = Application.class)
+@SpringBootTest
 @WireMockTest(httpPort = 8888)
 @ActiveProfiles("test_main_nonretryable")
 class ConsumerInvalidTopicTest extends AbstractKafkaTest {

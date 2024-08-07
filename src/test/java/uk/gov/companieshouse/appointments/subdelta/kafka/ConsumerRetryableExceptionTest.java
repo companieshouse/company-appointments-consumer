@@ -31,13 +31,12 @@ import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import uk.gov.companieshouse.appointments.subdelta.Application;
 import uk.gov.companieshouse.appointments.subdelta.companyprofile.ServiceRouter;
 import uk.gov.companieshouse.appointments.subdelta.exception.RetryableException;
 import uk.gov.companieshouse.stream.EventRecord;
 import uk.gov.companieshouse.stream.ResourceChangedData;
 
-@SpringBootTest(classes = Application.class)
+@SpringBootTest
 @WireMockTest(httpPort = 8888)
 @ActiveProfiles("test_main_retryable")
 class ConsumerRetryableExceptionTest extends AbstractKafkaTest {
