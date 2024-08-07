@@ -41,10 +41,8 @@ class ConsumerPositiveTest extends AbstractKafkaTest {
 
     @Autowired
     private KafkaConsumer<String, byte[]> testConsumer;
-
     @Autowired
     private KafkaProducer<String, byte[]> testProducer;
-
     @Autowired
     private TestConsumerAspect testConsumerAspect;
 
@@ -53,6 +51,7 @@ class ConsumerPositiveTest extends AbstractKafkaTest {
 
     @DynamicPropertySource
     static void props(DynamicPropertyRegistry registry) {
+        registry.add("spring.kafka.bootstrap-servers", kafka::getBootstrapServers);
         registry.add("steps", () -> 1);
     }
 
@@ -72,7 +71,6 @@ class ConsumerPositiveTest extends AbstractKafkaTest {
                 new EventRecord("", "", Collections.emptyList())), encoder);
 
         //when
-        String str = new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
         testProducer.send(
                 new ProducerRecord<>(STREAM_COMPANY_PROFILE_TOPIC, 0, System.currentTimeMillis(),
                         "key", outputStream.toByteArray()));
