@@ -24,13 +24,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
 @SpringBootTest
 @WireMockTest(httpPort = 8888)
-@ActiveProfiles("test_main_nonretryable")
 class ConsumerInvalidTopicTest extends AbstractKafkaTest {
 
     @Autowired

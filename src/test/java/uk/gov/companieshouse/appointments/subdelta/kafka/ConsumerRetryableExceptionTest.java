@@ -13,6 +13,7 @@ import static uk.gov.companieshouse.appointments.subdelta.kafka.TestUtils.STREAM
 
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import java.io.ByteArrayOutputStream;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 import org.apache.avro.io.DatumWriter;
@@ -23,12 +24,12 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import uk.gov.companieshouse.appointments.subdelta.companyprofile.ServiceRouter;
@@ -38,7 +39,6 @@ import uk.gov.companieshouse.stream.ResourceChangedData;
 
 @SpringBootTest
 @WireMockTest(httpPort = 8888)
-@ActiveProfiles("test_main_retryable")
 class ConsumerRetryableExceptionTest extends AbstractKafkaTest {
 
     @Autowired
@@ -55,6 +55,12 @@ class ConsumerRetryableExceptionTest extends AbstractKafkaTest {
     static void props(DynamicPropertyRegistry registry) {
         registry.add("spring.kafka.bootstrap-servers", kafka::getBootstrapServers);
         registry.add("steps", () -> 5);
+    }
+
+    @BeforeEach
+    public void setup() {
+        testConsumerAspect.resetLatch();
+        testConsumer.poll(Duration.ofMillis(1000));
     }
 
     @Test

@@ -29,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import uk.gov.companieshouse.appointments.subdelta.companyprofile.ServiceRouter;
@@ -39,7 +38,6 @@ import uk.gov.companieshouse.stream.ResourceChangedData;
 
 @SpringBootTest
 @WireMockTest(httpPort = 8888)
-@ActiveProfiles("test_main_nonretryable")
 class ConsumerNonRetryableExceptionTest extends AbstractKafkaTest {
 
     @Autowired
