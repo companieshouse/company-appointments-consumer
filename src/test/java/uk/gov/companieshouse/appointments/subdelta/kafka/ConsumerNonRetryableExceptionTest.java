@@ -10,9 +10,10 @@ import static uk.gov.companieshouse.appointments.subdelta.kafka.TestUtils.STREAM
 import static uk.gov.companieshouse.appointments.subdelta.kafka.TestUtils.STREAM_COMPANY_PROFILE_RETRY_TOPIC;
 import static uk.gov.companieshouse.appointments.subdelta.kafka.TestUtils.STREAM_COMPANY_PROFILE_TOPIC;
 
+import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import java.io.ByteArrayOutputStream;
+import java.time.Duration;
 import java.util.Collections;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.apache.avro.io.DatumWriter;
 import org.apache.avro.io.Encoder;
@@ -22,50 +23,46 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.kafka.test.EmbeddedKafkaBroker;
-import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import uk.gov.companieshouse.appointments.subdelta.Application;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import uk.gov.companieshouse.appointments.subdelta.companyprofile.ServiceRouter;
 import uk.gov.companieshouse.appointments.subdelta.exception.NonRetryableException;
 import uk.gov.companieshouse.stream.EventRecord;
 import uk.gov.companieshouse.stream.ResourceChangedData;
 
-@SpringBootTest(classes = Application.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@EmbeddedKafka(
-        topics = {STREAM_COMPANY_PROFILE_TOPIC,
-                STREAM_COMPANY_PROFILE_RETRY_TOPIC,
-                STREAM_COMPANY_PROFILE_ERROR_TOPIC,
-                STREAM_COMPANY_PROFILE_INVALID_TOPIC},
-        controlledShutdown = true,
-        partitions = 1
-)
-@Import(TestConfig.class)
+@SpringBootTest
+@WireMockTest(httpPort = 8888)
 @ActiveProfiles("test_main_nonretryable")
-class ConsumerNonRetryableExceptionTest {
-
-    @Autowired
-    private EmbeddedKafkaBroker embeddedKafkaBroker;
+class ConsumerNonRetryableExceptionTest extends AbstractKafkaTest {
 
     @Autowired
     private KafkaConsumer<String, byte[]> testConsumer;
-
     @Autowired
     private KafkaProducer<String, byte[]> testProducer;
-
     @Autowired
-    private CountDownLatch latch;
+    private TestConsumerAspect testConsumerAspect;
 
     @MockBean
     private ServiceRouter router;
+
+    @DynamicPropertySource
+    static void props(DynamicPropertyRegistry registry) {
+        registry.add("spring.kafka.bootstrap-servers", kafka::getBootstrapServers);
+        registry.add("steps", () -> 1);
+    }
+
+    @BeforeEach
+    public void setup() {
+        testConsumerAspect.resetLatch();
+        testConsumer.poll(Duration.ofMillis(1000));
+    }
 
     @Test
     void testRepublishToCompanyProfileInvalidMessageTopicIfNonRetryableExceptionThrown() throws Exception {
@@ -76,14 +73,13 @@ class ConsumerNonRetryableExceptionTest {
         writer.write(new ResourceChangedData("", "", "context_id", "12345678", "{}",
                 new EventRecord("", "", Collections.emptyList())), encoder);
 
-        embeddedKafkaBroker.consumeFromAllEmbeddedTopics(testConsumer);
         doThrow(NonRetryableException.class).when(router).route(any());
 
         //when
         testProducer.send(
                 new ProducerRecord<>(STREAM_COMPANY_PROFILE_TOPIC, 0, System.currentTimeMillis(),
                         "key", outputStream.toByteArray()));
-        if (!latch.await(5L, TimeUnit.SECONDS)) {
+        if (!testConsumerAspect.getLatch().await(5L, TimeUnit.SECONDS)) {
             fail("Timed out waiting for latch");
         }
         ConsumerRecords<?, ?> consumerRecords = KafkaTestUtils.getRecords(testConsumer, 10000L, 2);

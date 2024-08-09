@@ -6,7 +6,9 @@ import static uk.gov.companieshouse.appointments.subdelta.kafka.TestUtils.STREAM
 import static uk.gov.companieshouse.appointments.subdelta.kafka.TestUtils.STREAM_COMPANY_PROFILE_RETRY_TOPIC;
 import static uk.gov.companieshouse.appointments.subdelta.kafka.TestUtils.STREAM_COMPANY_PROFILE_TOPIC;
 
+import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import java.io.ByteArrayOutputStream;
+import java.time.Duration;
 import java.util.concurrent.Future;
 import org.apache.avro.io.DatumWriter;
 import org.apache.avro.io.Encoder;
@@ -17,39 +19,38 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.kafka.test.EmbeddedKafkaBroker;
-import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import uk.gov.companieshouse.appointments.subdelta.Application;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 
-@SpringBootTest(classes = Application.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@EmbeddedKafka(
-        topics = {STREAM_COMPANY_PROFILE_TOPIC,
-                STREAM_COMPANY_PROFILE_RETRY_TOPIC,
-                STREAM_COMPANY_PROFILE_ERROR_TOPIC,
-                STREAM_COMPANY_PROFILE_INVALID_TOPIC},
-        controlledShutdown = true,
-        partitions = 1
-)
+@SpringBootTest
+@WireMockTest(httpPort = 8888)
 @ActiveProfiles("test_main_nonretryable")
-@Import(TestConfig.class)
-class ConsumerInvalidTopicTest {
-
-    @Autowired
-    private EmbeddedKafkaBroker embeddedKafkaBroker;
+class ConsumerInvalidTopicTest extends AbstractKafkaTest {
 
     @Autowired
     private KafkaConsumer<String, byte[]> testConsumer;
-
     @Autowired
     private KafkaProducer<String, byte[]> testProducer;
+    @Autowired
+    private TestConsumerAspect testConsumerAspect;
+
+    @DynamicPropertySource
+    static void props(DynamicPropertyRegistry registry) {
+        registry.add("spring.kafka.bootstrap-servers", kafka::getBootstrapServers);
+        registry.add("steps", () -> 1);
+    }
+
+    @BeforeEach
+    public void setup() {
+        testConsumerAspect.resetLatch();
+        testConsumer.poll(Duration.ofMillis(1000));
+    }
 
     @Test
     void testPublishToCompanyProfileInvalidMessageTopicIfInvalidDataDeserialised() throws Exception {
@@ -58,8 +59,6 @@ class ConsumerInvalidTopicTest {
         Encoder encoder = EncoderFactory.get().directBinaryEncoder(outputStream, null);
         DatumWriter<String> writer = new ReflectDatumWriter<>(String.class);
         writer.write("bad data", encoder);
-
-        embeddedKafkaBroker.consumeFromAllEmbeddedTopics(testConsumer);
 
         //when
         Future<RecordMetadata> future = testProducer.send(

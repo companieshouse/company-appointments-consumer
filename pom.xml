@@ -38,11 +38,12 @@
     <!--sonar configuration-->
     <sonar.projectKey>uk.gov.companieshouse:company-appointments-consumer</sonar.projectKey>
     <sonar.sources>src/main</sonar.sources>
-    <sonar.tests>src/test,src/itest</sonar.tests>
+    <sonar.tests>src/test</sonar.tests>
     <sonar.verbose>true</sonar.verbose>
     <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml
     </sonar.coverage.jacoco.xmlReportPaths>
     <sonar.jacoco.reports>${project.build.directory}/site</sonar.jacoco.reports>
+    <test-containers.version>1.19.7</test-containers.version>
   </properties>
 
   <dependencyManagement>
@@ -58,6 +59,13 @@
         <groupId>io.cucumber</groupId>
         <artifactId>cucumber-bom</artifactId>
         <version>${cucumber.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>testcontainers-bom</artifactId>
+        <version>${test-containers.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -276,6 +284,21 @@
       <artifactId>junit-platform-commons</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>kafka</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -327,42 +350,6 @@
             <include>**/Runner.java</include>
           </includes>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <version>3.3.0</version>
-        <executions>
-          <execution>
-            <id>add-test-source</id>
-            <phase>generate-test-sources</phase>
-            <goals>
-              <goal>add-test-source</goal>
-            </goals>
-            <configuration>
-              <sources>
-                <source>src/itest/java</source>
-              </sources>
-            </configuration>
-          </execution>
-          <execution>
-            <id>add-test-resources</id>
-            <phase>generate-test-resources</phase>
-            <goals>
-              <goal>add-test-resource</goal>
-            </goals>
-            <configuration>
-              <resources>
-                <resource>
-                  <directory>src/itest/resources</directory>
-                  <includes>
-                    <include>**/*</include>
-                  </includes>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>com.google.cloud.tools</groupId>
