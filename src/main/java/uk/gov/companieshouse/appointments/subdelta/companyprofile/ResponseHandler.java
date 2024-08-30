@@ -30,15 +30,13 @@ public class ResponseHandler {
     }
 
     public void handle(String message, ApiErrorResponseException ex) {
-        if (HttpStatus.valueOf(ex.getStatusCode()).is5xxServerError()) {
-            LOGGER.info(message, DataMapHolder.getLogMap());
-            throw new RetryableException(message, ex);
-        } else if (HttpStatus.valueOf(ex.getStatusCode()) == HttpStatus.NOT_FOUND) {
-            LOGGER.info("HTTP response code 404 returned, appointments not yet inserted for company in context.",
-                    DataMapHolder.getLogMap());
-        } else {
+        if (HttpStatus.BAD_REQUEST.value() == ex.getStatusCode() || HttpStatus.CONFLICT.value() == ex.getStatusCode()){
             LOGGER.error(message, DataMapHolder.getLogMap());
             throw new NonRetryableException(message, ex);
+        }
+        else {
+            LOGGER.info(message, DataMapHolder.getLogMap());
+            throw new RetryableException(message, ex);
         }
     }
 }

@@ -55,9 +55,23 @@ class ResponseHandlerTest {
     }
 
     @Test
-    void handleApiErrorResponseExceptionNonRetryable() {
+    void handleApiErrorResponseExceptionNonRetryableBadRequest() {
         // given
-        HttpResponseException.Builder builder = new HttpResponseException.Builder(401, "unauthorized", new HttpHeaders());
+        HttpResponseException.Builder builder = new HttpResponseException.Builder(400, "unauthorized", new HttpHeaders());
+        ApiErrorResponseException apiErrorResponseException = new ApiErrorResponseException(builder);
+
+        // when
+        Executable executable = () -> responseHandler.handle("failed message", apiErrorResponseException);
+
+        // then
+        NonRetryableException exception = assertThrows(NonRetryableException.class, executable);
+        assertEquals("failed message", exception.getMessage());
+    }
+
+    @Test
+    void handleApiErrorResponseExceptionNonRetryableConflict() {
+        // given
+        HttpResponseException.Builder builder = new HttpResponseException.Builder(409, "unauthorized", new HttpHeaders());
         ApiErrorResponseException apiErrorResponseException = new ApiErrorResponseException(builder);
 
         // when
@@ -78,6 +92,7 @@ class ResponseHandlerTest {
         Executable executable = () -> responseHandler.handle("failed message", apiErrorResponseException);
 
         // then
-        assertDoesNotThrow(executable);
+        RetryableException exception = assertThrows(RetryableException.class, executable);
+        assertEquals("failed message", exception.getMessage());
     }
 }

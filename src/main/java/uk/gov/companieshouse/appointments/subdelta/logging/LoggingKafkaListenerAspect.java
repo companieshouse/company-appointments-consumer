@@ -2,11 +2,14 @@ package uk.gov.companieshouse.appointments.subdelta.logging;
 
 import static uk.gov.companieshouse.appointments.subdelta.Application.NAMESPACE;
 
+import consumer.exception.RetryableErrorException;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.logging.Logger;
@@ -22,19 +25,28 @@ class LoggingKafkaListenerAspect {
     private static final String LOG_MESSAGE_PROCESSED = "Processed delta";
     private static final String EXCEPTION_MESSAGE = "%s exception thrown: %s";
 
+    private final int maxAttempts;
+
+    public LoggingKafkaListenerAspect(@Value("${consumer.max_attempts}") int maxAttempts) {
+        this.maxAttempts = maxAttempts;
+    }
+
     @Around("@annotation(org.springframework.kafka.annotation.KafkaListener)")
     public Object manageStructuredLogging(ProceedingJoinPoint joinPoint)
         throws Throwable {
 
+        int retryCount = 0;
         try {
             Message<?> message = (Message<?>) joinPoint.getArgs()[0];
+            retryCount = Optional.ofNullable((Integer) joinPoint.getArgs()[1]).orElse(1) - 1;
             DataMapHolder.initialise(extractContextId(message.getPayload())
                     .orElse(UUID.randomUUID().toString()));
 
             DataMapHolder.get()
-                    .topic((String) message.getHeaders().get("kafka_receivedTopic"))
-                    .partition((Integer) message.getHeaders().get("kafka_receivedPartitionId"))
-                    .offset((Long) message.getHeaders().get("kafka_offset"));
+                    .retryCount(retryCount)
+                    .topic((String) joinPoint.getArgs()[2])
+                    .partition((Integer) joinPoint.getArgs()[3])
+                    .offset((Long) joinPoint.getArgs()[4]);
 
             LOGGER.debug(LOG_MESSAGE_RECEIVED, DataMapHolder.getLogMap());
 
@@ -43,6 +55,16 @@ class LoggingKafkaListenerAspect {
             LOGGER.debug(LOG_MESSAGE_PROCESSED, DataMapHolder.getLogMap());
 
             return result;
+        } catch (RetryableErrorException ex) {
+            // maxAttempts includes first attempt which is not a retry
+            if (retryCount >= maxAttempts - 1) {
+                LOGGER.error("Max retry attempts reached", ex, DataMapHolder.getLogMap());
+            } else {
+                LOGGER.info(String.format(EXCEPTION_MESSAGE,
+                                ex.getClass().getSimpleName(), Arrays.toString(ex.getStackTrace())),
+                        DataMapHolder.getLogMap());
+            }
+            throw ex;
         } catch (Exception ex) {
             LOGGER.debug(String.format(EXCEPTION_MESSAGE,
                 ex.getClass().getSimpleName(), ex.getMessage()), 
