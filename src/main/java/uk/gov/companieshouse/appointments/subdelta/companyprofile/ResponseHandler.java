@@ -34,7 +34,7 @@ public class ResponseHandler {
 
     public void handle(String message, ApiErrorResponseException ex) {
         if (HttpStatus.BAD_REQUEST.value() == ex.getStatusCode() || HttpStatus.CONFLICT.value() == ex.getStatusCode()) {
-            LOGGER.error(message, DataMapHolder.getLogMap());
+            LOGGER.error(message, ex, DataMapHolder.getLogMap());
             throw new NonRetryableException(message, ex);
         } else {
             LOGGER.info(
