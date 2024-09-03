@@ -2,6 +2,7 @@ package uk.gov.companieshouse.appointments.subdelta.companyprofile;
 
 import static uk.gov.companieshouse.appointments.subdelta.Application.NAMESPACE;
 
+import java.util.Arrays;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.api.error.ApiErrorResponseException;
@@ -35,7 +36,8 @@ public class ResponseHandler {
             throw new NonRetryableException(message, ex);
         }
         else {
-            LOGGER.info(message, DataMapHolder.getLogMap());
+            String stacktrace = ex.getClass().getSimpleName().concat(Arrays.toString(ex.getStackTrace()));
+            LOGGER.infoContext(message, stacktrace, DataMapHolder.getLogMap());
             throw new RetryableException(message, ex);
         }
     }
