@@ -18,6 +18,8 @@ public class ResponseHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NAMESPACE);
 
+    private static final String API_INFO_RESPONSE_MESSAGE = "Call to API failed, status code: %d. %s";
+
     public void handle(String message, URIValidationException ex) {
         LOGGER.error(message, DataMapHolder.getLogMap());
         throw new NonRetryableException(message, ex);
@@ -31,13 +33,13 @@ public class ResponseHandler {
     }
 
     public void handle(String message, ApiErrorResponseException ex) {
-        if (HttpStatus.BAD_REQUEST.value() == ex.getStatusCode() || HttpStatus.CONFLICT.value() == ex.getStatusCode()){
+        if (HttpStatus.BAD_REQUEST.value() == ex.getStatusCode() || HttpStatus.CONFLICT.value() == ex.getStatusCode()) {
             LOGGER.error(message, DataMapHolder.getLogMap());
             throw new NonRetryableException(message, ex);
-        }
-        else {
-            String stacktrace = ex.getClass().getSimpleName().concat(Arrays.toString(ex.getStackTrace()));
-            LOGGER.infoContext(message, stacktrace, DataMapHolder.getLogMap());
+        } else {
+            LOGGER.info(
+                    String.format(API_INFO_RESPONSE_MESSAGE, ex.getStatusCode(), Arrays.toString(ex.getStackTrace())),
+                    DataMapHolder.getLogMap());
             throw new RetryableException(message, ex);
         }
     }
