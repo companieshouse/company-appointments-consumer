@@ -21,7 +21,7 @@ public class ResponseHandler {
     private static final String API_INFO_RESPONSE_MESSAGE = "Call to API failed, status code: %d. %s";
 
     public void handle(String message, URIValidationException ex) {
-        LOGGER.error(message, DataMapHolder.getLogMap());
+        LOGGER.error(message, ex, DataMapHolder.getLogMap());
         throw new NonRetryableException(message, ex);
     }
 
