@@ -1,6 +1,5 @@
 package uk.gov.companieshouse.appointments.subdelta.companyprofile;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -55,9 +54,23 @@ class ResponseHandlerTest {
     }
 
     @Test
-    void handleApiErrorResponseExceptionNonRetryable() {
+    void handleApiErrorResponseExceptionNonRetryableBadRequest() {
         // given
-        HttpResponseException.Builder builder = new HttpResponseException.Builder(401, "unauthorized", new HttpHeaders());
+        HttpResponseException.Builder builder = new HttpResponseException.Builder(400, "bad request", new HttpHeaders());
+        ApiErrorResponseException apiErrorResponseException = new ApiErrorResponseException(builder);
+
+        // when
+        Executable executable = () -> responseHandler.handle("failed message", apiErrorResponseException);
+
+        // then
+        NonRetryableException exception = assertThrows(NonRetryableException.class, executable);
+        assertEquals("failed message", exception.getMessage());
+    }
+
+    @Test
+    void handleApiErrorResponseExceptionNonRetryableConflict() {
+        // given
+        HttpResponseException.Builder builder = new HttpResponseException.Builder(409, "conflict", new HttpHeaders());
         ApiErrorResponseException apiErrorResponseException = new ApiErrorResponseException(builder);
 
         // when
@@ -78,6 +91,7 @@ class ResponseHandlerTest {
         Executable executable = () -> responseHandler.handle("failed message", apiErrorResponseException);
 
         // then
-        assertDoesNotThrow(executable);
+        RetryableException exception = assertThrows(RetryableException.class, executable);
+        assertEquals("failed message", exception.getMessage());
     }
 }

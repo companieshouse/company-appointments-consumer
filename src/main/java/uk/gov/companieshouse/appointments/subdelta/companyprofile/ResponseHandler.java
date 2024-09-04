@@ -2,6 +2,7 @@ package uk.gov.companieshouse.appointments.subdelta.companyprofile;
 
 import static uk.gov.companieshouse.appointments.subdelta.Application.NAMESPACE;
 
+import java.util.Arrays;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.api.error.ApiErrorResponseException;
@@ -17,8 +18,10 @@ public class ResponseHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NAMESPACE);
 
+    private static final String API_INFO_RESPONSE_MESSAGE = "Call to API failed, status code: %d. %s";
+
     public void handle(String message, URIValidationException ex) {
-        LOGGER.error(message, DataMapHolder.getLogMap());
+        LOGGER.error(message, ex, DataMapHolder.getLogMap());
         throw new NonRetryableException(message, ex);
     }
 
@@ -30,15 +33,14 @@ public class ResponseHandler {
     }
 
     public void handle(String message, ApiErrorResponseException ex) {
-        if (HttpStatus.valueOf(ex.getStatusCode()).is5xxServerError()) {
-            LOGGER.info(message, DataMapHolder.getLogMap());
-            throw new RetryableException(message, ex);
-        } else if (HttpStatus.valueOf(ex.getStatusCode()) == HttpStatus.NOT_FOUND) {
-            LOGGER.info("HTTP response code 404 returned, appointments not yet inserted for company in context.",
-                    DataMapHolder.getLogMap());
-        } else {
-            LOGGER.error(message, DataMapHolder.getLogMap());
+        if (HttpStatus.BAD_REQUEST.value() == ex.getStatusCode() || HttpStatus.CONFLICT.value() == ex.getStatusCode()) {
+            LOGGER.error(message, ex, DataMapHolder.getLogMap());
             throw new NonRetryableException(message, ex);
+        } else {
+            LOGGER.info(
+                    String.format(API_INFO_RESPONSE_MESSAGE, ex.getStatusCode(), Arrays.toString(ex.getStackTrace())),
+                    DataMapHolder.getLogMap());
+            throw new RetryableException(message, ex);
         }
     }
 }

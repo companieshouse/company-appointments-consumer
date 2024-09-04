@@ -78,7 +78,7 @@ class ConsumerRetryableExceptionTest extends AbstractKafkaTest {
         testProducer.send(
                 new ProducerRecord<>(STREAM_COMPANY_PROFILE_TOPIC, 0, System.currentTimeMillis(),
                         "key", outputStream.toByteArray()));
-        if (!testConsumerAspect.getLatch().await(5L, TimeUnit.SECONDS)) {
+        if (!testConsumerAspect.getLatch().await(30L, TimeUnit.SECONDS)) {
             fail("Timed out waiting for latch");
         }
 
