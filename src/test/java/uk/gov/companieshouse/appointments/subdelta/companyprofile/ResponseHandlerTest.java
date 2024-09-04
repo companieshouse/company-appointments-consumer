@@ -56,7 +56,7 @@ class ResponseHandlerTest {
     @Test
     void handleApiErrorResponseExceptionNonRetryableBadRequest() {
         // given
-        HttpResponseException.Builder builder = new HttpResponseException.Builder(400, "unauthorized", new HttpHeaders());
+        HttpResponseException.Builder builder = new HttpResponseException.Builder(400, "bad request", new HttpHeaders());
         ApiErrorResponseException apiErrorResponseException = new ApiErrorResponseException(builder);
 
         // when
@@ -70,7 +70,7 @@ class ResponseHandlerTest {
     @Test
     void handleApiErrorResponseExceptionNonRetryableConflict() {
         // given
-        HttpResponseException.Builder builder = new HttpResponseException.Builder(409, "unauthorized", new HttpHeaders());
+        HttpResponseException.Builder builder = new HttpResponseException.Builder(409, "conflict", new HttpHeaders());
         ApiErrorResponseException apiErrorResponseException = new ApiErrorResponseException(builder);
 
         // when
