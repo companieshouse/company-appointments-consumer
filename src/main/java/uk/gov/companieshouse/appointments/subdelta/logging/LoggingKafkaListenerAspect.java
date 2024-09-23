@@ -4,6 +4,7 @@ import static uk.gov.companieshouse.appointments.subdelta.Application.NAMESPACE;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.UUID;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -39,7 +40,8 @@ class LoggingKafkaListenerAspect {
         try {
             Message<?> message = (Message<?>) joinPoint.getArgs()[0];
             retryCount = Optional.ofNullable((Integer) joinPoint.getArgs()[1]).orElse(1) - 1;
-            DataMapHolder.initialise(extractData(message.getPayload()).getContextId());
+            DataMapHolder.initialise(Optional.of(extractData(message.getPayload()).getContextId())
+                    .orElse(UUID.randomUUID().toString()));
 
             DataMapHolder.get()
                     .retryCount(retryCount)
