@@ -38,7 +38,7 @@ public class CompanyProfileChangedService implements Service {
             throw new NonRetryableException(DESERIALISE_FAILED_MESSAGE, ex);
         }
 
-        LOGGER.info(DESERIALISE_SUCCEEDED_MESSAGE, DataMapHolder.getLogMap());
+        LOGGER.debug(DESERIALISE_SUCCEEDED_MESSAGE, DataMapHolder.getLogMap());
         String uri = changedData.getResourceUri() + EXISTING_APPOINTMENTS_URI_SUFFIX;
         appointmentsClient.patchCompanyNameAndStatusForAllAppointments(uri, companyProfileData.getCompanyName(),
                 companyProfileData.getCompanyStatus());

@@ -4,13 +4,13 @@ import static uk.gov.companieshouse.appointments.subdelta.Application.NAMESPACE;
 
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.UUID;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
+import uk.gov.companieshouse.appointments.subdelta.exception.NonRetryableException;
 import uk.gov.companieshouse.appointments.subdelta.exception.RetryableException;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.logging.LoggerFactory;
@@ -39,8 +39,7 @@ class LoggingKafkaListenerAspect {
         try {
             Message<?> message = (Message<?>) joinPoint.getArgs()[0];
             retryCount = Optional.ofNullable((Integer) joinPoint.getArgs()[1]).orElse(1) - 1;
-            DataMapHolder.initialise(extractContextId(message.getPayload())
-                    .orElse(UUID.randomUUID().toString()));
+            DataMapHolder.initialise(extractData(message.getPayload()).getContextId());
 
             DataMapHolder.get()
                     .retryCount(retryCount)
@@ -66,19 +65,17 @@ class LoggingKafkaListenerAspect {
             }
             throw ex;
         } catch (Exception ex) {
-            LOGGER.error(String.format(EXCEPTION_MESSAGE,
-                            ex.getClass().getSimpleName(), ex.getMessage()),
-                    DataMapHolder.getLogMap());
+            LOGGER.error(ex.getMessage(), ex, DataMapHolder.getLogMap());
             throw ex;
         } finally {
             DataMapHolder.clear();
         }
     }
 
-    private Optional<String> extractContextId(Object payload) {
+    private ResourceChangedData extractData(Object payload) {
         if (payload instanceof ResourceChangedData) {
-            return Optional.of(((ResourceChangedData) payload).getContextId());
+            return (ResourceChangedData) payload;
         }
-        return Optional.empty();
+        throw new NonRetryableException(String.format("Invalid payload type. Payload: %s", payload.toString()));
     }
 }

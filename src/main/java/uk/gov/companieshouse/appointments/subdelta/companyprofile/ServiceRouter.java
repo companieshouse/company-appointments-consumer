@@ -24,7 +24,7 @@ public class ServiceRouter {
 
     public void route(ResourceChangedData changedData) {
         if (EVENT_TYPE_CHANGED.equals(changedData.getEvent().getType())) {
-            LOGGER.info(SUCCESS_MESSAGE, DataMapHolder.getLogMap());
+            LOGGER.debug(SUCCESS_MESSAGE, DataMapHolder.getLogMap());
             companyProfileChangedService.processMessage(changedData);
         } else {
             LOGGER.info(NOT_PROCESSED_MESSAGE, DataMapHolder.getLogMap());

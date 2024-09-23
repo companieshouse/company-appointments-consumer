@@ -46,6 +46,6 @@ public class AppointmentsClient {
         } catch (URIValidationException ex) {
             responseHandler.handle(String.format(FAILED_MSG, resourceUri), ex);
         }
-        LOGGER.info("Successfully called PATCH endpoint on Company Profile API", DataMapHolder.getLogMap());
+        LOGGER.info("Successfully called PATCH endpoint on Company Appointments API", DataMapHolder.getLogMap());
     }
 }
