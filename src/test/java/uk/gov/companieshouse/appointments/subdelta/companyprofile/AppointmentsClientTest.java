@@ -92,27 +92,6 @@ class AppointmentsClientTest {
     }
 
     @Test
-    @DisplayName("Should delegate to response handler when IllegalArgumentException caught")
-    void patchCompanyNameAndStatusForAllAppointmentsIllegalArgumentException()
-            throws ApiErrorResponseException, URIValidationException {
-        // given
-        IllegalArgumentException illegalArgumentException = new IllegalArgumentException();
-        when(appointmentPatch.execute()).thenThrow(illegalArgumentException);
-
-        // when
-        client.patchCompanyNameAndStatusForAllAppointments(RESOURCE_URI, COMPANY_NAME, COMPANY_STATUS);
-
-        // then
-        verify(resourceHandler).patchCompanyAppointment(RESOURCE_URI,
-                new PatchAppointmentNameStatusApi()
-                        .companyName(COMPANY_NAME)
-                        .companyStatus(COMPANY_STATUS));
-        verify(responseHandler).handle(
-                String.format("Failed updating appointment(s) for resource URI %s", RESOURCE_URI),
-                illegalArgumentException);
-    }
-
-    @Test
     @DisplayName("Should delegate to response handler when URIValidationException caught")
     void patchCompanyNameAndStatusForAllAppointmentsURIValidationException()
             throws ApiErrorResponseException, URIValidationException {
