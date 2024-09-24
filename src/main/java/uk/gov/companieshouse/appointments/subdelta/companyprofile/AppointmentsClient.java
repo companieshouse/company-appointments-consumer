@@ -41,8 +41,6 @@ public class AppointmentsClient {
         } catch (ApiErrorResponseException ex) {
             responseHandler.handle(
                     String.format(ERROR_MSG, ex.getStatusCode(), resourceUri), ex);
-        } catch (IllegalArgumentException ex) {
-            responseHandler.handle(String.format(FAILED_MSG, resourceUri), ex);
         } catch (URIValidationException ex) {
             responseHandler.handle(String.format(FAILED_MSG, resourceUri), ex);
         }
