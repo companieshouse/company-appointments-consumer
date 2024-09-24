@@ -45,9 +45,9 @@ class LoggingKafkaListenerAspect {
 
             DataMapHolder.get()
                     .retryCount(retryCount)
-                    .topic((String) message.getHeaders().get("kafka_receivedTopic"))
-                    .partition((Integer) message.getHeaders().get("kafka_receivedPartitionId"))
-                    .offset((Long) message.getHeaders().get("kafka_offset"));
+                    .topic((String) joinPoint.getArgs()[2])
+                    .partition((Integer) joinPoint.getArgs()[3])
+                    .offset((Long) joinPoint.getArgs()[4]);
 
             LOGGER.info(LOG_MESSAGE_RECEIVED, DataMapHolder.getLogMap());
 
