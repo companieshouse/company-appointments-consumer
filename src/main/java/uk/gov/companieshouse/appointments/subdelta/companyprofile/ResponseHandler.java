@@ -25,13 +25,6 @@ public class ResponseHandler {
         throw new NonRetryableException(message, ex);
     }
 
-    public void handle(String message, IllegalArgumentException ex) {
-        String causeMessage = ex.getCause() != null
-                ? String.format("; %s", ex.getCause().getMessage()) : "";
-        LOGGER.info(message + causeMessage, DataMapHolder.getLogMap());
-        throw new RetryableException(message, ex);
-    }
-
     public void handle(String message, ApiErrorResponseException ex) {
         if (HttpStatus.BAD_REQUEST.value() == ex.getStatusCode() || HttpStatus.CONFLICT.value() == ex.getStatusCode()) {
             LOGGER.error(message, ex, DataMapHolder.getLogMap());

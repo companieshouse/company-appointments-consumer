@@ -30,16 +30,6 @@ class ResponseHandlerTest {
     }
 
     @Test
-    void handleIllegalArgumentException() {
-        // when
-        Executable executable = () -> responseHandler.handle("failed message", new IllegalArgumentException("Illegal Argument"));
-
-        // then
-        RetryableException exception = assertThrows(RetryableException.class, executable);
-        assertEquals("failed message", exception.getMessage());
-    }
-
-    @Test
     void handleApiErrorResponseExceptionRetryable() {
         // given
         HttpResponseException.Builder builder = new HttpResponseException.Builder(503, "service unavailable", new HttpHeaders());
