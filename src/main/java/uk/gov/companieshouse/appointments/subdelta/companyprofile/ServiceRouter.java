@@ -12,6 +12,7 @@ import uk.gov.companieshouse.stream.ResourceChangedData;
 public class ServiceRouter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NAMESPACE);
+    private static final String SUCCESS_MESSAGE = "Event type changed - processing message";
     private static final String NOT_PROCESSED_MESSAGE = "Message was not processed as event type was not 'changed'";
     private static final String EVENT_TYPE_CHANGED = "changed";
 
@@ -23,9 +24,10 @@ public class ServiceRouter {
 
     public void route(ResourceChangedData changedData) {
         if (EVENT_TYPE_CHANGED.equals(changedData.getEvent().getType())) {
+            LOGGER.debug(SUCCESS_MESSAGE, DataMapHolder.getLogMap());
             companyProfileChangedService.processMessage(changedData);
         } else {
-            LOGGER.debug(NOT_PROCESSED_MESSAGE, DataMapHolder.getLogMap());
+            LOGGER.info(NOT_PROCESSED_MESSAGE, DataMapHolder.getLogMap());
         }
     }
 }
