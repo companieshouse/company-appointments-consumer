@@ -7,6 +7,19 @@ using the ResourceChangeData avro schema.
 * The messages are processed by sending PATCH requests to the Company Appointments API to update each appointment
 for the changed company profiles.
 
+## Context
+
+```mermaid
+
+sequenceDiagram
+    CHIPS company profile->>chs-delta-api: update
+    chs-delta-api->>company-profile-consumer: save to Kafka
+    company-profile-consumer->>company-profile-api: save to Mongo
+    company-profile-api->>chs-kafka-api: request to add to topic
+    chs-kafka-api->>company-appointments-consumer: go through streaming to let consumers know of change
+    company-appointments-consumer->>company-appointments-api: new officers are saved in mongo
+```
+
 ## System requirements
 
 * [Git](https://git-scm.com/downloads)
