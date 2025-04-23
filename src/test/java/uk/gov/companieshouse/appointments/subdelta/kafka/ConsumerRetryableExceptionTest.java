@@ -11,11 +11,11 @@ import static uk.gov.companieshouse.appointments.subdelta.kafka.TestUtils.STREAM
 import static uk.gov.companieshouse.appointments.subdelta.kafka.TestUtils.STREAM_COMPANY_PROFILE_RETRY_TOPIC;
 import static uk.gov.companieshouse.appointments.subdelta.kafka.TestUtils.STREAM_COMPANY_PROFILE_TOPIC;
 
-import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import java.io.ByteArrayOutputStream;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
+
 import org.apache.avro.io.DatumWriter;
 import org.apache.avro.io.Encoder;
 import org.apache.avro.io.EncoderFactory;
@@ -28,10 +28,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
+import com.github.tomakehurst.wiremock.junit5.WireMockTest;
+
 import uk.gov.companieshouse.appointments.subdelta.companyprofile.ServiceRouter;
 import uk.gov.companieshouse.appointments.subdelta.exception.RetryableException;
 import uk.gov.companieshouse.stream.EventRecord;
@@ -48,7 +51,7 @@ class ConsumerRetryableExceptionTest extends AbstractKafkaTest {
     @Autowired
     private TestConsumerAspect testConsumerAspect;
 
-    @MockBean
+    @MockitoBean
     private ServiceRouter router;
 
     @DynamicPropertySource
@@ -83,7 +86,7 @@ class ConsumerRetryableExceptionTest extends AbstractKafkaTest {
         }
 
         //then
-        ConsumerRecords<?, ?> consumerRecords = KafkaTestUtils.getRecords(testConsumer, 10000L, 6);
+        ConsumerRecords<?, ?> consumerRecords = KafkaTestUtils.getRecords(testConsumer, Duration.ofMillis(10000L), 6);
         assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, STREAM_COMPANY_PROFILE_TOPIC)).isEqualTo(1);
         assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, STREAM_COMPANY_PROFILE_RETRY_TOPIC))
                 .isEqualTo(4);

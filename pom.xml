@@ -22,29 +22,31 @@
   <packaging>jar</packaging>
 
   <properties>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
-    <spring.boot.version>2.7.14</spring.boot.version>
-    <cucumber.version>7.11.2</cucumber.version>
-    <jib.version>3.3.1</jib.version>
-    <structured-logging.version>1.9.37</structured-logging.version>
-    <api-sdk-manager-java-library.version>1.0.6</api-sdk-manager-java-library.version>
-    <private-api-sdk-java.version>2.0.294</private-api-sdk-java.version>
-    <kafka-models.version>1.0.31</kafka-models.version>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
+    <spring.boot.version>3.4.4</spring.boot.version>
+    <cucumber.version>7.22.0</cucumber.version>
+    <jib-maven-plugin.version>3.4.5</jib-maven-plugin.version>
+    <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+    <structured-logging.version>3.0.30</structured-logging.version>
+    <api-sdk-manager-java-library.version>3.0.7</api-sdk-manager-java-library.version>
+    <private-api-sdk-java.version>4.0.290</private-api-sdk-java.version>
+    <kafka-models.version>3.0.12</kafka-models.version>
     <wiremock.version>3.5.2</wiremock.version>
     <!--explicit versions of transitive dependencies with vulnerabilities in previous versions-->
     <jayway-jsonpath.version>2.9.0</jayway-jsonpath.version>
     <skip.unit.tests>false</skip.unit.tests>
     <skip.integration.tests>false</skip.integration.tests>
+    <avro.version>1.12.0</avro.version>
     <!--sonar configuration-->
     <sonar.projectKey>uk.gov.companieshouse:company-appointments-consumer</sonar.projectKey>
     <sonar.sources>src/main</sonar.sources>
     <sonar.tests>src/test</sonar.tests>
     <sonar.verbose>true</sonar.verbose>
-    <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml
-    </sonar.coverage.jacoco.xmlReportPaths>
+    <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     <sonar.jacoco.reports>${project.build.directory}/site</sonar.jacoco.reports>
-    <test-containers.version>1.19.7</test-containers.version>
+    <test-containers.version>1.20.6</test-containers.version>
+    <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
   </properties>
 
   <dependencyManagement>
@@ -70,10 +72,16 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+    <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-bom</artifactId>
+        <version>5.17.0</version>
+        <type>pom</type>
+    </dependency>
     </dependencies>
   </dependencyManagement>
   <dependencies>
-    <!--the following transitive dependencies are added specifically to avoid vulnerabilities-->
+      <!--the following transitive dependencies are added specifically to avoid vulnerabilities-->
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-compress</artifactId>
@@ -116,7 +124,6 @@
       <version>1.1.10.5</version>
     </dependency>
     <!--end transitive dependencies-->
-
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
@@ -191,22 +198,15 @@
       <version>${private-api-sdk-java.version}</version>
     </dependency>
     <dependency>
+        <groupId>org.apache.avro</groupId>
+        <artifactId>avro</artifactId>
+        <version>${avro.version}</version>
+    </dependency>
+    <dependency>
       <groupId>uk.gov.companieshouse</groupId>
       <artifactId>kafka-models</artifactId>
       <version>${kafka-models.version}</version>
       <exclusions>
-        <exclusion>
-          <groupId>com.jayway.jsonpath</groupId>
-          <artifactId>json-path</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commons-fileupload</groupId>
-          <artifactId>commons-fileupload</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.eclipse.jetty</groupId>
-          <artifactId>jetty-xml</artifactId>
-        </exclusion>
         <exclusion>
           <groupId>org.eclipse.jetty</groupId>
           <artifactId>jetty-client</artifactId>
@@ -218,10 +218,6 @@
         <exclusion>
           <groupId>org.eclipse.jetty</groupId>
           <artifactId>jetty-webapp</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.github.tomakehurst</groupId>
-          <artifactId>wiremock-jre8</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -253,11 +249,6 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-junit-jupiter</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-inline</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -318,7 +309,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>${maven-surefire-plugin.version}</version>
         <configuration>
           <skipTests>${skip.unit.tests}</skipTests>
           <excludes>
@@ -327,40 +318,29 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <version>3.0.0</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>integration-test</goal>
-              <goal>verify</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <!-- See SUREFIRE-1198 -->
-          <classesDirectory>${project.build.outputDirectory}</classesDirectory>
-          <properties>
-            <configurationParameters>
-              cucumber.junit-platform.naming-strategy=long
-            </configurationParameters>
-          </properties>
-          <skipITs>${skip.integration.tests}</skipITs>
-          <includes>
-            <include>**/Runner.java</include>
-          </includes>
-        </configuration>
+          <groupId>com.google.cloud.tools</groupId>
+          <artifactId>jib-maven-plugin</artifactId>
+          <version>${jib-maven-plugin.version}</version>
+          <configuration>
+              <from>
+                  <image>416670754337.dkr.ecr.eu-west-2.amazonaws.com/ci-corretto-build-21</image>
+              </from>
+              <to>
+                  <image>416670754337.dkr.ecr.eu-west-2.amazonaws.com/accounts-user-api</image>
+              </to>
+              <container>
+                  <expandClasspathDependencies>true</expandClasspathDependencies>
+              </container>
+          </configuration>
       </plugin>
       <plugin>
-        <groupId>com.google.cloud.tools</groupId>
-        <artifactId>jib-maven-plugin</artifactId>
-        <version>${jib.version}</version>
-        <configuration>
-          <container>
-            <expandClasspathDependencies>true</expandClasspathDependencies>
-          </container>
-        </configuration>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven-compiler-plugin.version}</version>
+          <configuration>
+              <source>21</source>
+              <target>21</target>
+          </configuration>
       </plugin>
       <plugin>
         <groupId>org.jacoco</groupId>
@@ -413,4 +393,3 @@
     </plugins>
   </build>
 </project>
-

@@ -63,7 +63,7 @@ class ConsumerInvalidTopicTest extends AbstractKafkaTest {
                 new ProducerRecord<>(STREAM_COMPANY_PROFILE_TOPIC,
                         0, System.currentTimeMillis(), "key", outputStream.toByteArray()));
         future.get();
-        ConsumerRecords<?, ?> consumerRecords = KafkaTestUtils.getRecords(testConsumer, 10000L, 2);
+        ConsumerRecords<?, ?> consumerRecords = KafkaTestUtils.getRecords(testConsumer, Duration.ofMillis(10000L), 2);
 
         //then
         assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, STREAM_COMPANY_PROFILE_TOPIC)).isEqualTo(1);
