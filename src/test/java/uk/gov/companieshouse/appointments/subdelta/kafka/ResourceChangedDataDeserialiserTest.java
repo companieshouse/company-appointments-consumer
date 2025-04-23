@@ -48,7 +48,7 @@ class ResourceChangedDataDeserialiserTest {
 
     @Test
     @DisplayName("Throws InvalidPayloadException if IOException encountered when deserialising a message")
-    void testDeserialiseDataThrowsInvalidPayloadExceptionlIfIOExceptionEncountered()
+    void testDeserialiseDataThrowsInvalidPayloadExceptionIfIOExceptionEncountered()
             throws IOException {
         // given
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -65,11 +65,12 @@ class ResourceChangedDataDeserialiserTest {
         // Note the '\n' is the length prefix of the invalid data sent to the deserialiser
         assertThat(exception.getMessage()).isEqualTo("Invalid payload: [\nhello] was provided.");
         assertThat(exception.getCause()).isInstanceOf(IOException.class);
+        deserialiser.close();
     }
 
     @Test
     @DisplayName("Throws InvalidPayloadException if AvroRuntimeException encountered when deserialising a message")
-    void testDeserialiseDataThrowsInvalidPayloadExceptionlIfAvroRuntimeExceptionEncountered() {
+    void testDeserialiseDataThrowsInvalidPayloadExceptionIfAvroRuntimeExceptionEncountered() {
         // given
         ResourceChangedDataDeserialiser deserialiser = new ResourceChangedDataDeserialiser();
 
@@ -81,5 +82,6 @@ class ResourceChangedDataDeserialiserTest {
         InvalidPayloadException exception = assertThrows(InvalidPayloadException.class, actual);
         assertThat(exception.getMessage()).isEqualTo("Invalid payload: [invalid] was provided.");
         assertThat(exception.getCause()).isInstanceOf(AvroRuntimeException.class);
+        deserialiser.close();
     }
 }

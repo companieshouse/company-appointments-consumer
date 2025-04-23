@@ -8,6 +8,7 @@ import static uk.gov.companieshouse.appointments.subdelta.kafka.TestUtils.STREAM
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -19,6 +20,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+
 
 @TestConfiguration
 public class TestConfig {

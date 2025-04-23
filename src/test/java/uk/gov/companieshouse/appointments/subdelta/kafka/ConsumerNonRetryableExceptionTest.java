@@ -10,11 +10,11 @@ import static uk.gov.companieshouse.appointments.subdelta.kafka.TestUtils.STREAM
 import static uk.gov.companieshouse.appointments.subdelta.kafka.TestUtils.STREAM_COMPANY_PROFILE_RETRY_TOPIC;
 import static uk.gov.companieshouse.appointments.subdelta.kafka.TestUtils.STREAM_COMPANY_PROFILE_TOPIC;
 
-import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import java.io.ByteArrayOutputStream;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
+
 import org.apache.avro.io.DatumWriter;
 import org.apache.avro.io.Encoder;
 import org.apache.avro.io.EncoderFactory;
@@ -27,17 +27,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
 import uk.gov.companieshouse.appointments.subdelta.companyprofile.ServiceRouter;
 import uk.gov.companieshouse.appointments.subdelta.exception.NonRetryableException;
 import uk.gov.companieshouse.stream.EventRecord;
 import uk.gov.companieshouse.stream.ResourceChangedData;
+import static java.time.temporal.ChronoUnit.SECONDS;
 
-@SpringBootTest
-@WireMockTest(httpPort = 8888)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ConsumerNonRetryableExceptionTest extends AbstractKafkaTest {
 
     @Autowired
@@ -47,7 +48,7 @@ class ConsumerNonRetryableExceptionTest extends AbstractKafkaTest {
     @Autowired
     private TestConsumerAspect testConsumerAspect;
 
-    @MockBean
+    @MockitoBean
     private ServiceRouter router;
 
     @DynamicPropertySource
@@ -58,6 +59,7 @@ class ConsumerNonRetryableExceptionTest extends AbstractKafkaTest {
 
     @BeforeEach
     public void setup() {
+        kafka.withStartupTimeout(Duration.of(300, SECONDS));
         testConsumerAspect.resetLatch();
         testConsumer.poll(Duration.ofMillis(1000));
     }
@@ -80,7 +82,7 @@ class ConsumerNonRetryableExceptionTest extends AbstractKafkaTest {
         if (!testConsumerAspect.getLatch().await(30L, TimeUnit.SECONDS)) {
             fail("Timed out waiting for latch");
         }
-        ConsumerRecords<?, ?> consumerRecords = KafkaTestUtils.getRecords(testConsumer, 10000L, 2);
+        ConsumerRecords<?, ?> consumerRecords = KafkaTestUtils.getRecords(testConsumer, Duration.ofMillis(10000L), 2);
 
         //then
         assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, STREAM_COMPANY_PROFILE_TOPIC)).isEqualTo(1);
