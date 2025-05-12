@@ -9,12 +9,14 @@ import static org.mockito.Mockito.spy;
 
 import java.io.IOException;
 import java.util.Collections;
+
 import org.apache.avro.io.DatumWriter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import uk.gov.companieshouse.appointments.subdelta.exception.NonRetryableException;
 import uk.gov.companieshouse.stream.EventRecord;
 import uk.gov.companieshouse.stream.ResourceChangedData;
@@ -38,6 +40,7 @@ class ResourceChangedDataSerialiserTest {
 
         // then
         assertThat(actual).isNotNull();
+        serialiser.close();
     }
 
     @Test

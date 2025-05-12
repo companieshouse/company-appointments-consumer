@@ -30,6 +30,8 @@ hs_err_pid*
 .idea/
 *.iml
 
+.vscode/
+
 # Mac files
 .DS_Store
 

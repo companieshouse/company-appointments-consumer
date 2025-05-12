@@ -6,10 +6,10 @@ import static uk.gov.companieshouse.appointments.subdelta.kafka.TestUtils.STREAM
 import static uk.gov.companieshouse.appointments.subdelta.kafka.TestUtils.STREAM_COMPANY_PROFILE_RETRY_TOPIC;
 import static uk.gov.companieshouse.appointments.subdelta.kafka.TestUtils.STREAM_COMPANY_PROFILE_TOPIC;
 
-import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import java.io.ByteArrayOutputStream;
 import java.time.Duration;
 import java.util.concurrent.Future;
+
 import org.apache.avro.io.DatumWriter;
 import org.apache.avro.io.Encoder;
 import org.apache.avro.io.EncoderFactory;
@@ -26,9 +26,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.wait.strategy.Wait;
+import static java.time.temporal.ChronoUnit.SECONDS;
 
-@SpringBootTest
-@WireMockTest(httpPort = 8888)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ConsumerInvalidTopicTest extends AbstractKafkaTest {
 
     @Autowired
@@ -46,6 +47,8 @@ class ConsumerInvalidTopicTest extends AbstractKafkaTest {
 
     @BeforeEach
     public void setup() {
+                kafka.setWaitStrategy(Wait.defaultWaitStrategy()
+                .withStartupTimeout(Duration.of(300, SECONDS)));
         testConsumerAspect.resetLatch();
         testConsumer.poll(Duration.ofMillis(1000));
     }
@@ -63,7 +66,7 @@ class ConsumerInvalidTopicTest extends AbstractKafkaTest {
                 new ProducerRecord<>(STREAM_COMPANY_PROFILE_TOPIC,
                         0, System.currentTimeMillis(), "key", outputStream.toByteArray()));
         future.get();
-        ConsumerRecords<?, ?> consumerRecords = KafkaTestUtils.getRecords(testConsumer, 10000L, 2);
+        ConsumerRecords<?, ?> consumerRecords = KafkaTestUtils.getRecords(testConsumer, Duration.ofMillis(10000L), 2);
 
         //then
         assertThat(TestUtils.noOfRecordsForTopic(consumerRecords, STREAM_COMPANY_PROFILE_TOPIC)).isEqualTo(1);

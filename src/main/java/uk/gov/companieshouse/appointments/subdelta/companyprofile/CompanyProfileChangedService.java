@@ -40,6 +40,7 @@ public class CompanyProfileChangedService implements Service {
 
         LOGGER.debug(DESERIALISE_SUCCEEDED_MESSAGE, DataMapHolder.getLogMap());
         String uri = changedData.getResourceUri() + EXISTING_APPOINTMENTS_URI_SUFFIX;
+
         appointmentsClient.patchCompanyNameAndStatusForAllAppointments(uri, companyProfileData.getCompanyName(),
                 companyProfileData.getCompanyStatus());
     }

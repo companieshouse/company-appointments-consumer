@@ -2,7 +2,7 @@
 
 ## Summary
 
-* The company appointments consumer consumes messages from the stream-company-profile Kafka topic and deserialises them 
+* The company appointments consumer consumes messages from the stream-company-profile Kafka topic and deserialises them
 using the ResourceChangeData avro schema.
 * The messages are processed by sending PATCH requests to the Company Appointments API to update each appointment
 for the changed company profiles.
@@ -34,10 +34,10 @@ sequenceDiagram
    README.
 2. Enable the following services using the command `./bin/chs-dev services enable <service>`.
    * company-appointments-consumer
-   * company-appointments-api-ch-gov-uk
-3. Enable the streaming module using the command `./bin/chs-dev modules enable streaming`
-4. Boot up the services' containers on docker using tilt `tilt up`.
-5. Messages can be produced to the stream-company-profile using the instructions given in 
+   * chs-kafka-api
+   * chs-streaming-api
+3. Boot up the services' containers on docker using chs-dev `chs-dev up`.
+4. Messages can be produced to the stream-company-profile using the instructions given in
 [CHS Kafka API](https://github.com/companieshouse/chs-kafka-api).
 
 ## Environment variables
@@ -81,4 +81,3 @@ short-term, we have decided to change the `make test-unit` command in the Makefi
 will ensure unit AND integration tests are run and that coverage is added to the jacoco reporting and, therefore, produce accurate SonarQube reporting on GitHub.
 
 For a more in-depth explanation, please see: https://companieshouse.atlassian.net/wiki/spaces/TEAM4/pages/4357128294/DSND-1990+Tech+Debt+Spike+-+Fix+SonarQube+within+Pom+of+Projects
-
