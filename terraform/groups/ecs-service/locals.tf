@@ -1,17 +1,17 @@
 # Define all hardcoded local variable and local variables looked up from data resources
 locals {
-  stack_name                  = "payments-service" # this must match the stack name the service deploys into
+  stack_name                  = "data-sync" # this must match the stack name the service deploys into
   name_prefix                 = "${local.stack_name}-${var.environment}"
   global_prefix               = "global-${var.environment}"
-  service_name                = "payment-processed-consumer"
-  container_port              = "20188"
-  docker_repo                 = "payment-processed-consumer"
+  service_name                = "company-appointments-consumer"
+  container_port              = "8080"
+  docker_repo                 = "company-appointments-consumer"
   kms_alias                   = "alias/${var.aws_profile}/environment-services-kms"
-  healthcheck_path            = "/healthcheck"
+  healthcheck_path            = "/company-appointments-consumer/healthcheck"
   healthcheck_matcher         = "200"
   vpc_name                    = local.stack_secrets["vpc_name"]
   s3_config_bucket            = data.vault_generic_secret.shared_s3.data["config_bucket_name"]
-  app_environment_filename    = "payment-processed-consumer.env"
+  app_environment_filename    = "company-appointments-consumer.env"
   use_set_environment_files   = var.use_set_environment_files
   application_subnet_ids      = data.aws_subnets.application.ids
 
