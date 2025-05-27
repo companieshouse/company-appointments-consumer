@@ -28,6 +28,7 @@ sequenceDiagram
 * [MongoDB](https://www.mongodb.com/)
 * [Apache Kafka](https://kafka.apache.org/)
 
+
 ## Building and Running Locally using Docker
 
 1. Clone [Docker CHS Development](https://github.com/companieshouse/docker-chs-development) and follow the steps in the
