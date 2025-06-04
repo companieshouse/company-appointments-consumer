@@ -35,6 +35,9 @@
     <avro.version>1.12.0</avro.version>
     <test-containers.version>1.21.0</test-containers.version>
     <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
+    <tomcat-embed-core.version>11.0.7</tomcat-embed-core.version>
+    <commons-beanutils2.version>2.0.0-M2</commons-beanutils2.version>
+    <spring-context.version>6.2.7</spring-context.version>
   </properties>
 
   <dependencyManagement>
@@ -104,6 +107,12 @@
       <groupId>uk.gov.companieshouse</groupId>
       <artifactId>private-api-sdk-java</artifactId>
       <version>${private-api-sdk-java.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-beanutils</groupId>
+          <artifactId>commons-beanutils</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.avro</groupId>
@@ -163,6 +172,22 @@
       <groupId>org.testcontainers</groupId>
       <artifactId>junit-jupiter</artifactId>
       <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-beanutils2 -->
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-beanutils2</artifactId>
+      <version>${commons-beanutils2.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat.embed</groupId>
+      <artifactId>tomcat-embed-core</artifactId>
+      <version>${tomcat-embed-core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+      <version>${spring-context.version}</version>
     </dependency>
   </dependencies>
 
