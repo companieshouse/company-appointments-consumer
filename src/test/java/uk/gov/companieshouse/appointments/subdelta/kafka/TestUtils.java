@@ -9,6 +9,7 @@ public final class TestUtils {
     static final String STREAM_COMPANY_PROFILE_RETRY_TOPIC = "stream-company-profile-company-appointments-consumer-retry";
     static final String STREAM_COMPANY_PROFILE_ERROR_TOPIC = "stream-company-profile-company-appointments-consumer-error";
     static final String STREAM_COMPANY_PROFILE_INVALID_TOPIC = "stream-company-profile-company-appointments-consumer-invalid";
+    public static final String INTEGRATION = "integration-test";
 
     private TestUtils() {
     }

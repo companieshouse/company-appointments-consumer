@@ -1,6 +1,7 @@
 package uk.gov.companieshouse.appointments.subdelta.kafka;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.companieshouse.appointments.subdelta.kafka.TestUtils.INTEGRATION;
 import static uk.gov.companieshouse.appointments.subdelta.kafka.TestUtils.STREAM_COMPANY_PROFILE_ERROR_TOPIC;
 import static uk.gov.companieshouse.appointments.subdelta.kafka.TestUtils.STREAM_COMPANY_PROFILE_INVALID_TOPIC;
 import static uk.gov.companieshouse.appointments.subdelta.kafka.TestUtils.STREAM_COMPANY_PROFILE_RETRY_TOPIC;
@@ -20,6 +21,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,6 +31,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.wait.strategy.Wait;
 import static java.time.temporal.ChronoUnit.SECONDS;
 
+@Tag(INTEGRATION)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ConsumerInvalidTopicTest extends AbstractKafkaTest {
 
