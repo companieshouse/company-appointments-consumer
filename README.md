@@ -2,10 +2,12 @@
 
 ## Summary
 
+* **This service will be deprecated in the near future. Its business behaviour has been replicated in CHIPS DB and so has been scaled down to
+  0 tasks in all environments.**
 * The company appointments consumer consumes messages from the stream-company-profile Kafka topic and deserialises them
-using the ResourceChangeData avro schema.
+  using the ResourceChangeData avro schema.
 * The messages are processed by sending PATCH requests to the Company Appointments API to update each appointment
-for the changed company profiles.
+  for the changed company profiles.
 
 ## Context
 
@@ -33,12 +35,12 @@ sequenceDiagram
 1. Clone [Docker CHS Development](https://github.com/companieshouse/docker-chs-development) and follow the steps in the
    README.
 2. Enable the following services using the command `./bin/chs-dev services enable <service>`.
-   * company-appointments-consumer
-   * chs-kafka-api
-   * chs-streaming-api
+    * company-appointments-consumer
+    * chs-kafka-api
+    * chs-streaming-api
 3. Boot up the services' containers on docker using chs-dev `chs-dev up`.
 4. Messages can be produced to the stream-company-profile using the instructions given in
-[CHS Kafka API](https://github.com/companieshouse/chs-kafka-api).
+   [CHS Kafka API](https://github.com/companieshouse/chs-kafka-api).
 
 ## Environment variables
 
@@ -72,12 +74,17 @@ This will clone the company-appointments-consumer into the repositories folder. 
 automatically trigger a rebuild and relaunch.
 
 ## Makefile Changes
+
 The jacoco exec file that SonarQube uses on GitHub is incomplete and, therefore, produces incorrect test coverage
-reporting when code is pushed up to the repo. This is because the `analyse-pull-request` job runs when we push code to an open PR and this job runs `make test-unit`.
+reporting when code is pushed up to the repo. This is because the `analyse-pull-request` job runs when we push code to an open PR
+and this job runs `make test-unit`.
 Therefore, the jacoco exec reporting only covers unit test coverage, not integration test coverage.
 
 To remedy this, in the
-short-term, we have decided to change the `make test-unit` command in the Makefile to run `mvn clean verify -Dskip.unit.tests=false -Dskip.integration.tests=false` instead as this
-will ensure unit AND integration tests are run and that coverage is added to the jacoco reporting and, therefore, produce accurate SonarQube reporting on GitHub.
+short-term, we have decided to change the `make test-unit` command in the Makefile to run
+`mvn clean verify -Dskip.unit.tests=false -Dskip.integration.tests=false` instead as this
+will ensure unit AND integration tests are run and that coverage is added to the jacoco reporting and, therefore, produce accurate
+SonarQube reporting on GitHub.
 
-For a more in-depth explanation, please see: https://companieshouse.atlassian.net/wiki/spaces/TEAM4/pages/4357128294/DSND-1990+Tech+Debt+Spike+-+Fix+SonarQube+within+Pom+of+Projects
+For a more in-depth explanation, please
+see: https://companieshouse.atlassian.net/wiki/spaces/TEAM4/pages/4357128294/DSND-1990+Tech+Debt+Spike+-+Fix+SonarQube+within+Pom+of+Projects
